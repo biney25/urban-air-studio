@@ -102,4 +102,6 @@ Local checkpoints record development on October9–10,2026. There was no Git
 repository/history in the working folder at compliance review. Any first real
 commit is a snapshot at its actual creation time; earlier commits will not be
 fabricated or backdated. Checkpoints supplement provenance but do not recreate
-missing Git history. This local package is **unpublished and awaiting release review**.
+missing Git history. This audited source package was published with the owner's
+approval at [biney25/urban-air-studio](https://github.com/biney25/urban-air-studio).
+Private development data and later unaudited changes remain local.
