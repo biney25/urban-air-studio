@@ -17,6 +17,12 @@ pinned OpenFOAM case preparation and a cancellable native diagnostic worker.
 Protected downloads and a scientific review manifest retain input/runtime hashes
 and unresolved qualification gates. Supplied data is explicitly fictional.
 
+The full product is planned as a **map-first workbench for Delhi and wider India**:
+explore licensed geographic/evidence layers, select an area and prepare a study,
+with client-plan upload as an additional route. Automatic city coverage and live
+geometry/monitoring/weather provider integrations are **not implemented yet**.
+Current local workflow acceptance does not establish completion of that scope.
+
 ## Architecture and AWS usage
 
 React/TypeScript + Vite/Cesium frontend → FastAPI → scoped immutable Store and
