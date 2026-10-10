@@ -1,0 +1,16 @@
+{
+  "schema_version": "source-rights-v1",
+  "assets": [{
+    "source_id": "synthetic-campus-v1",
+    "path": "datasets/fictional_campus.geojson",
+    "origin": "project-generated fictional integration fixture",
+    "evidence_kind": "illustrative",
+    "licence_id": "project-generated-synthetic-fixture-v1",
+    "permitted_uses": {"display": true, "derive": true, "solve": true, "export": true, "test": true},
+    "attribution": "Fictional Urban Air Studio integration fixture; no actual Delhi site, survey or emissions.",
+    "measurement_status": "not_observed",
+    "restrictions": ["Never portray these buildings/rates/receptors as real-world observations or calibrated inputs."]
+  }],
+  "external_provider_status": "no authenticated or locally qualified provider source implemented",
+  "default_unknown_permission": "blocked"
+}

@@ -1,0 +1,68 @@
+{
+  "title": "Illustrative measurement campaign",
+  "kind": "measurement_campaign",
+  "evidence_kind": "illustrative",
+  "source_label": "Fictional Phase B software fixture; no measurements, calibrated factors or independent review",
+  "rights": {
+    "derive": true,
+    "solve": true,
+    "export": true
+  },
+  "payload": {
+    "purpose": "Illustrative campaign to exercise reusable QC; no field measurements",
+    "instruments": [
+      {
+        "id": "device-1",
+        "upstream_id": "upstream-1",
+        "location_id": "site-1",
+        "species": "PM2.5",
+        "longitude": 77.1,
+        "latitude": 28.7,
+        "inlet_height_m": 2,
+        "serial": "device-1",
+        "configuration": "Illustrative device metadata",
+        "calibration_version": "illustrative-v1",
+        "calibration_uncertainty_ug_m3": 1,
+        "collocation_record": "Illustrative only",
+        "maintenance_note": "No actual instrument deployed",
+        "clock_offset_seconds": 30
+      },
+      {
+        "id": "device-2",
+        "upstream_id": "upstream-2",
+        "location_id": "site-2",
+        "species": "PM2.5",
+        "longitude": 77.11,
+        "latitude": 28.7,
+        "inlet_height_m": 2,
+        "serial": "device-2",
+        "configuration": "Illustrative device metadata",
+        "calibration_version": "illustrative-v1",
+        "calibration_uncertainty_ug_m3": 1,
+        "collocation_record": "Illustrative only",
+        "maintenance_note": "No actual instrument deployed",
+        "clock_offset_seconds": 30
+      }
+    ],
+    "observations": [
+      {
+        "id": "row-1",
+        "instrument_id": "device-1",
+        "interval_start": "2026-10-09T10:00:00+05:30",
+        "interval_end": "2026-10-09T11:00:00+05:30",
+        "raw_value": 25,
+        "raw_unit": "ug/m3",
+        "provider_qa": "accepted"
+      },
+      {
+        "id": "row-2",
+        "instrument_id": "device-2",
+        "interval_start": "2026-10-10T10:00:00+05:30",
+        "interval_end": "2026-10-10T11:00:00+05:30",
+        "raw_value": 30,
+        "raw_unit": "ug/m3",
+        "provider_qa": "accepted"
+      }
+    ]
+  }
+}

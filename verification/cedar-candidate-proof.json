@@ -1,0 +1,45 @@
+{
+  "schema_version": "hackathon-cedar-demonstration-v1",
+  "success": true,
+  "recorded_at": "2026-10-10T16:01:14.808851+00:00",
+  "qualified": false,
+  "transport": "actual in-process ASGI API; real native Cedar; isolated illustrative store; no mocks",
+  "live_project_database_modified": false,
+  "aws_deployed": false,
+  "cloud_spend_usd": 0,
+  "checks": [
+    {
+      "operation": "derive illustrative inventory",
+      "http_status": 201,
+      "decision": "Allow",
+      "engine": "cedar-policy/4.12.0",
+      "policy_sha256": "sha256:1e9ee0ba52a4668ab9c0a7a3840e99608da389122d1e89203991f13f6f6446f3"
+    },
+    {
+      "operation": "export permitted inventory",
+      "http_status": 200,
+      "decision": "Allow",
+      "engine": "cedar-policy/4.12.0",
+      "policy_sha256": "sha256:1e9ee0ba52a4668ab9c0a7a3840e99608da389122d1e89203991f13f6f6446f3"
+    },
+    {
+      "operation": "derive illustrative inventory",
+      "http_status": 201,
+      "decision": "Allow",
+      "engine": "cedar-policy/4.12.0",
+      "policy_sha256": "sha256:1e9ee0ba52a4668ab9c0a7a3840e99608da389122d1e89203991f13f6f6446f3"
+    },
+    {
+      "operation": "export restricted inventory",
+      "http_status": 403,
+      "decision": "Deny",
+      "engine": "cedar-policy/4.12.0",
+      "policy_sha256": "sha256:1e9ee0ba52a4668ab9c0a7a3840e99608da389122d1e89203991f13f6f6446f3"
+    }
+  ],
+  "source_sha256": {
+    "api/authorization.py": "a888471ef44724becc000eae066ac8807a6f1d41abaadd730f688b8ba33f11bc",
+    "api/policies/phase_b.cedar": "1e9ee0ba52a4668ab9c0a7a3840e99608da389122d1e89203991f13f6f6446f3",
+    "api/policies/phase_b.cedarschema": "0d1255094f94ef28e3898b4ac4fb40ee6bd6f4e4fd9b417eb0e98871d1267880"
+  }
+}

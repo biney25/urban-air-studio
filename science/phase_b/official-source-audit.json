@@ -1,0 +1,292 @@
+{
+  "distribution": "OpenFOAM Foundation",
+  "version": "13",
+  "source_commit": "18870c24d21c6b982e2cdec27b2f59738cca5f90",
+  "repository": "https://github.com/OpenFOAM/OpenFOAM-13",
+  "files": [
+    {
+      "path": "src/atmosphericModels/derivedFvPatchFields/atmBoundaryLayer/atmBoundaryLayer.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/atmosphericModels/derivedFvPatchFields/atmBoundaryLayer/atmBoundaryLayer.C",
+      "sha256": "bf8f39eca1252bda8b0feb4bbdbc3f9b623bda950dcab92770a9a3e1ffbc20bd",
+      "bytes": 6747,
+      "retrieved": true
+    },
+    {
+      "path": "src/atmosphericModels/derivedFvPatchFields/atmBoundaryLayer/atmBoundaryLayer.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/atmosphericModels/derivedFvPatchFields/atmBoundaryLayer/atmBoundaryLayer.H",
+      "sha256": "8e45d18e2a5d479c232abaed76df73e2873cd2b73094d487618a47ff4a22732d",
+      "bytes": 8600,
+      "retrieved": true
+    },
+    {
+      "path": "src/atmosphericModels/derivedFvPatchFields/nutkAtmRoughWallFunction/nutkAtmRoughWallFunctionFvPatchScalarField.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/atmosphericModels/derivedFvPatchFields/nutkAtmRoughWallFunction/nutkAtmRoughWallFunctionFvPatchScalarField.H",
+      "sha256": "8d0dc55cef8768d78d31dbbba991052fc4b9f57bce55fa8d002830b47c825c38",
+      "bytes": 5529,
+      "retrieved": true
+    },
+    {
+      "path": "src/fvModels/general/semiImplicitSource/semiImplicitSource.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/fvModels/general/semiImplicitSource/semiImplicitSource.H",
+      "sha256": "0fb54623fd006107cf141d3292000c2cbf7f628262471ec68b73202d4570d6c8",
+      "bytes": 6730,
+      "retrieved": true
+    },
+    {
+      "path": "src/functionObjects/solvers/scalarTransport/scalarTransport.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/functionObjects/solvers/scalarTransport/scalarTransport.H",
+      "sha256": "d3b6b7995cf915c6da6193dce54c658dd443daa9408473032fd42bd1bdb1960a",
+      "bytes": 6664,
+      "retrieved": true
+    },
+    {
+      "path": "src/functionObjects/solvers/scalarTransport/scalarTransport.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/functionObjects/solvers/scalarTransport/scalarTransport.C",
+      "sha256": "27ec164f03284593751d611c332e8d74f5c865bb18cffd01b35a8bd263dd29f2",
+      "bytes": 16492,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/pitzDailySteady/constant/physicalProperties",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/pitzDailySteady/constant/physicalProperties",
+      "sha256": "fbf744fdf868d8706db11b602a52d20dce3e5892a24a9c0081ca87ae70b551d2",
+      "bytes": 732,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/pitzDailySteady/constant/momentumTransport",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/pitzDailySteady/constant/momentumTransport",
+      "sha256": "b45c82c0c9dae8279c0622bdaeeb74c3178184a4cab73e1d6ac7755eac3b619a",
+      "bytes": 915,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/pitzDailySteady/system/controlDict",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/pitzDailySteady/system/controlDict",
+      "sha256": "a0a84bba9004b227091dbc1a96df05464e7fa431b28459300f39ccfa016f2fa7",
+      "bytes": 1077,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/pitzDailySteady/system/fvSolution",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/pitzDailySteady/system/fvSolution",
+      "sha256": "bad8b9f2e6200d0fa4b080a7624ddaf43e0d44651ddee5de5c15d133d8d9e61f",
+      "bytes": 1562,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/pitzDailyScalarTransport/system/functions",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/pitzDailyScalarTransport/system/functions",
+      "sha256": "7ecde5dd9e6d6a33890eadb4ba181833486097584c655d0c1756a42a94d42747",
+      "bytes": 1431,
+      "retrieved": true
+    },
+    {
+      "path": "src/fvModels/general/semiImplicitSource/semiImplicitSource.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/fvModels/general/semiImplicitSource/semiImplicitSource.C",
+      "sha256": "39f30c98c2e29bf0fa9b836f6ee5fe81f0ee9ca055f5635f5e5535f306a5bb34",
+      "bytes": 6731,
+      "retrieved": true
+    },
+    {
+      "path": "src/finiteVolume/fvMesh/fvCellZone/fvCellZone.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/finiteVolume/fvMesh/fvCellZone/fvCellZone.C",
+      "sha256": "6b155f8819b8403bca7f3594ecafcd684435c6c7fa2183ca3290c863461afdf5",
+      "bytes": 3218,
+      "retrieved": true
+    },
+    {
+      "path": "src/meshTools/zoneGenerators/cell/generatedCellZone/generatedCellZone.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/meshTools/zoneGenerators/cell/generatedCellZone/generatedCellZone.C",
+      "sha256": "dcf625550a4ba8b84bb99bf212afb94c87b802622e5bb2d3939c3a2517c479a1",
+      "bytes": 3974,
+      "retrieved": true
+    },
+    {
+      "path": "src/MomentumTransportModels/momentumTransportModels/RAS/kEpsilon/kEpsilon.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/MomentumTransportModels/momentumTransportModels/RAS/kEpsilon/kEpsilon.C",
+      "sha256": "71703ec529f88d64ce52890ac94e74e5449091e4602c07c1771cc02b815265ad",
+      "bytes": 7106,
+      "retrieved": true
+    },
+    {
+      "path": "src/atmosphericModels/derivedFvPatchFields/nutkAtmRoughWallFunction/nutkAtmRoughWallFunctionFvPatchScalarField.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/atmosphericModels/derivedFvPatchFields/nutkAtmRoughWallFunction/nutkAtmRoughWallFunctionFvPatchScalarField.C",
+      "sha256": "10a651c20c43953c5de9effe246000113f080028c3933e2266925f2ec3759191",
+      "bytes": 5019,
+      "retrieved": true
+    },
+    {
+      "path": "src/MomentumTransportModels/momentumTransportModels/derivedFvPatchFields/wallFunctions/epsilonWallFunctions/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/MomentumTransportModels/momentumTransportModels/derivedFvPatchFields/wallFunctions/epsilonWallFunctions/epsilonWallFunction/epsilonWallFunctionFvPatchScalarField.C",
+      "sha256": "44124db8ae3a676c975f12141f8380613e0743f90c3b913bec0247f91760a4de",
+      "bytes": 8121,
+      "retrieved": true
+    },
+    {
+      "path": "src/MomentumTransportModels/momentumTransportModels/derivedFvPatchFields/wallFunctions/nutWallFunctions/nutWallFunction/nutWallFunctionFvPatchScalarField.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/MomentumTransportModels/momentumTransportModels/derivedFvPatchFields/wallFunctions/nutWallFunctions/nutWallFunction/nutWallFunctionFvPatchScalarField.C",
+      "sha256": "7c9a49e19ed0b721064d2aa5dfc2b3ef1897a342297e14c9b53673d93571a27e",
+      "bytes": 5318,
+      "retrieved": true
+    },
+    {
+      "path": "src/sampling/probes/probes.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/sampling/probes/probes.C",
+      "sha256": "639885c6e851367299ffc4e00300de39c15d9ce363b12960836ad1c290a6cb97",
+      "bytes": 12681,
+      "retrieved": true
+    },
+    {
+      "path": "src/sampling/probes/probes.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/sampling/probes/probes.H",
+      "sha256": "9a45876c60258d0f5e6605b7c982f84d41720cd46a6b824aa11f11cfa3110dc1",
+      "bytes": 8038,
+      "retrieved": true
+    },
+    {
+      "path": "applications/utilities/preProcessing/setAtmBoundaryLayer/setAtmBoundaryLayer.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/utilities/preProcessing/setAtmBoundaryLayer/setAtmBoundaryLayer.C",
+      "sha256": "066eed84c484a21c5eb0a920d787f3b6b328b4019e28fa5be37dadbcaabbf76f",
+      "bytes": 4912,
+      "retrieved": true
+    },
+    {
+      "path": "etc/caseDicts/mesh/generation/meshQualityDict",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/etc/caseDicts/mesh/generation/meshQualityDict",
+      "sha256": "11477feb2c7015085b586d7e8af7d9e4374553b4e477a5648c2ba9c5b9de5819",
+      "bytes": 2282,
+      "retrieved": true
+    },
+    {
+      "path": "etc/caseDicts/mesh/generation/snappyHexMeshDict.cfg",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/etc/caseDicts/mesh/generation/snappyHexMeshDict.cfg",
+      "sha256": "0c6cf0461797a648458b925b1d1f8a6714c92f2b112bdaa6422cfe8524e6a024",
+      "bytes": 1807,
+      "retrieved": true
+    },
+    {
+      "path": "etc/caseDicts/functions/solvers/scalarTransport.cfg",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/etc/caseDicts/functions/solvers/scalarTransport.cfg",
+      "sha256": "80479c322892cd0c2c3fe64fc8cceab500c24f8764753d268e1e06a5de593d30",
+      "bytes": 556,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/pitzDailySteady/system/fvSchemes",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/pitzDailySteady/system/fvSchemes",
+      "sha256": "43da45588168ce7884e4f76ab9328af7149a27e483b6e37605142fe70169946a",
+      "bytes": 1366,
+      "retrieved": true
+    },
+    {
+      "path": "bin/scalarTransportFoam",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/bin/scalarTransportFoam",
+      "sha256": "16409e9b6759babe67ee06d54f923c34711ca5b990fd4e0b96a2e3c8860b6c82",
+      "bytes": 2690,
+      "retrieved": true
+    },
+    {
+      "path": "applications/solvers/foamRun/foamRun.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/solvers/foamRun/foamRun.C",
+      "sha256": "5c1e6e34c4bd253f5cc4665a8672f21b6ded2c7a5e391c67419f7586a7b5de91",
+      "bytes": 5730,
+      "retrieved": true
+    },
+    {
+      "path": "applications/utilities/mesh/generation/blockMesh/blockMesh.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/utilities/mesh/generation/blockMesh/blockMesh.C",
+      "sha256": "aa6d76bb3c31e4452b415f5df4156f675425bb3acc2520b7cc5d8956db95cf1a",
+      "bytes": 11457,
+      "retrieved": true
+    },
+    {
+      "path": "applications/utilities/mesh/generation/snappyHexMesh/snappyHexMesh.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/utilities/mesh/generation/snappyHexMesh/snappyHexMesh.C",
+      "sha256": "5dc44f4d4e3ef5f262d9272bf4aa211d1dc1ab4e526a3299c9229ba97f9becf3",
+      "bytes": 39424,
+      "retrieved": true
+    },
+    {
+      "path": "applications/utilities/mesh/manipulation/topoSet/topoSet.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/utilities/mesh/manipulation/topoSet/topoSet.C",
+      "sha256": "ab9eb50079fbb771d97b76a10d14e4e603ee4d860861028700f700ecc6019f2e",
+      "bytes": 11129,
+      "retrieved": true
+    },
+    {
+      "path": "applications/utilities/mesh/manipulation/checkMesh/checkMesh.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/applications/utilities/mesh/manipulation/checkMesh/checkMesh.C",
+      "sha256": "28983956d0d460957ede3003d9b7e93d0cca8094771990a1ebf6fea2e6876b15",
+      "bytes": 9713,
+      "retrieved": true
+    },
+    {
+      "path": "src/topoSetSources/cellSources/boxToCell/boxToCell.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/topoSetSources/cellSources/boxToCell/boxToCell.C",
+      "sha256": "2ebd1d552557aa2b884607ef39c192d0dff15fab71085bc275ad77fc09709534",
+      "bytes": 3126,
+      "retrieved": true
+    },
+    {
+      "path": "src/topoSetSources/cellZoneSources/setToCellZone/setToCellZone.C",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/topoSetSources/cellZoneSources/setToCellZone/setToCellZone.C",
+      "sha256": "fe9b2266072710298decce4b62446569f7dd8e4346941522bdbcfcc62c986285",
+      "bytes": 3940,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/fluid/stackPlume/0/U.orig",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/fluid/stackPlume/0/U.orig",
+      "sha256": "f5bb4d6b6fb726119bfdb483e77b55cacee82e9c2226d212fe41a3c391148fd4",
+      "bytes": 1341,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/fluid/stackPlume/0/nut",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/fluid/stackPlume/0/nut",
+      "sha256": "d858b7cf1ba77c6ea69f384633097cbd6cb18597b9e856be515bdc7b8c73da1e",
+      "bytes": 1043,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/fluid/stackPlume/system/scalarTransport",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/fluid/stackPlume/system/scalarTransport",
+      "sha256": "b86d13cc008ceacecd97cc08f1c1ed90cc964e02b4aede826e7d4ef102836ff6",
+      "bytes": 1244,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/fluid/stackPlume/system/setAtmBoundaryLayerDict",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/fluid/stackPlume/system/setAtmBoundaryLayerDict",
+      "sha256": "1146bd0b37d37a886b205191a9ebab142ca00817786e69bca92f8b8fb2d93908",
+      "bytes": 810,
+      "retrieved": true
+    },
+    {
+      "path": "tutorials/incompressibleFluid/windAroundBuildings/system/snappyHexMeshDict",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/tutorials/incompressibleFluid/windAroundBuildings/system/snappyHexMeshDict",
+      "sha256": "c23647c41b347d1327e8c6c496272a9f91a99e89dcde662872850e86c8feb701",
+      "bytes": 1802,
+      "retrieved": true
+    },
+    {
+      "path": "src/topoSetSources/cellSources/boxToCell/boxToCell.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/topoSetSources/cellSources/boxToCell/boxToCell.H",
+      "sha256": "1da3c43482a86f36de5459024c325689094136b421e1313ff5e4ec2a13c458a7",
+      "bytes": 2936,
+      "retrieved": true
+    },
+    {
+      "path": "src/topoSetSources/cellZoneSources/setToCellZone/setToCellZone.H",
+      "url": "https://raw.githubusercontent.com/OpenFOAM/OpenFOAM-13/18870c24d21c6b982e2cdec27b2f59738cca5f90/src/topoSetSources/cellZoneSources/setToCellZone/setToCellZone.H",
+      "sha256": "421a91a108bfc60b2aa2e00eb439594cd1e24907b75f10317c8a7ec204e86dc5",
+      "bytes": 2832,
+      "retrieved": true
+    }
+  ],
+  "solver_executed": false,
+  "license": "Official source GPL; local raw references are not executable inputs",
+  "removed_missing_reference": "tutorials/incompressibleFluid/pitzDailyScalarTransport/constant/fvModels (absent; replaced by implemented semiImplicitSource and cell-zone sources)",
+  "audit_scope": "Exact pinned source syntax review; no compiled runtime or numerical compatibility result"
+}

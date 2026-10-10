@@ -1,0 +1,38 @@
+{
+  "title": "Illustrative inventory",
+  "kind": "inventory",
+  "evidence_kind": "illustrative",
+  "source_label": "Fictional Phase B software fixture; no measurements, calibrated factors or independent review",
+  "rights": {
+    "derive": true,
+    "solve": true,
+    "export": true
+  },
+  "payload": {
+    "species": "PM2.5",
+    "interval_start": "2026-10-09T10:00:00+05:30",
+    "interval_end": "2026-10-09T11:00:00+05:30",
+    "segments": [
+      {
+        "id": "road-1",
+        "length_m": 1000,
+        "fleet": [
+          {
+            "category": "illustrative-car",
+            "vehicles_per_hour": 3600,
+            "factor_g_per_vehicle_km": 2,
+            "factor_source": "Illustrative factor, not measured",
+            "count_uncertainty_fraction": 0.1,
+            "factor_uncertainty_fraction": 0.2
+          }
+        ]
+      }
+    ],
+    "background": {
+      "mode": "independent_inflow",
+      "value_ug_m3": 10,
+      "includes_local_emissions": false
+    },
+    "uncertainty_note": "Illustrative parameter ranges; not independent probabilities"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "title": "Illustrative replay protocol",
+  "kind": "replay_protocol",
+  "evidence_kind": "illustrative",
+  "source_label": "Fictional Phase B software fixture; no measurements, calibrated factors or independent review",
+  "rights": {
+    "derive": true,
+    "solve": true,
+    "export": true
+  },
+  "payload": {
+    "campaign_evidence_id": "evidence-fixture",
+    "calibration_locations": [
+      "site-1"
+    ],
+    "evaluation_locations": [
+      "site-2"
+    ],
+    "calibration_blocks": [
+      {
+        "start": "2026-10-09T00:00:00Z",
+        "end": "2026-10-10T00:00:00Z"
+      }
+    ],
+    "evaluation_blocks": [
+      {
+        "start": "2026-10-10T00:00:00Z",
+        "end": "2026-10-11T00:00:00Z"
+      }
+    ],
+    "wind_nrmse_limit": 0.3,
+    "concentration_fac2_min": 0.6,
+    "concentration_floor_ug_m3": 0.01,
+    "uncertainty_note": "Proposed illustrative protocol; not preregistered or evaluated"
+  }
+}

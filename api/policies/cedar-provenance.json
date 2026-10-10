@@ -1,0 +1,26 @@
+{
+  "binding": "cedarpy",
+  "binding_version": "4.12.0",
+  "binding_maintainer": "k9securityio",
+  "binding_support": "Community binding; not officially supported by AWS or the Cedar Policy team",
+  "binding_source": "https://github.com/k9securityio/cedar-py",
+  "engine": "cedar-policy",
+  "engine_version": "4.12.0",
+  "engine_origin": "AWS-origin open-source Cedar policy engine",
+  "engine_source": "https://github.com/cedar-policy/cedar",
+  "aws_origin_source": "https://aws.amazon.com/tw/about-aws/whats-new/2023/05/cedar-open-source-language-access-control/",
+  "license": "Apache-2.0",
+  "sdist_sha256": "9d165f2fafeb724eff1b0aa49140c21918c52187bdc283f1227f29e439b7922e",
+  "wheels": {
+    "win32": {
+      "filename": "cedarpy-4.12.0-cp313-cp313-win_amd64.whl",
+      "sha256": "ded1a8f80e1ae1ddec1ce308790f1facb9fb3065369df4c227759b6fe1606223",
+      "native_sha256": "70ff9ccf1b44f7b06a35c26559f31a36b8b4484ed66c709f310498af9474fbeb"
+    },
+    "linux": {
+      "filename": "cedarpy-4.12.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "919186c88c60116f0e116b8a2e830fcae8247e66f83252faad12a0f128a0505e",
+      "native_sha256": "3e44fe1bc87d0504cfa45a42643297105e7e35d1b80e0cd5e7d81400ac20c61a"
+    }
+  }
+}

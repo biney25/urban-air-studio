@@ -1,0 +1,27 @@
+{
+  "title": "Illustrative held-out assessment",
+  "kind": "replay_assessment",
+  "evidence_kind": "illustrative",
+  "source_label": "Fictional interval-mean predictions; not solver output or field validation",
+  "rights": {
+    "derive": true,
+    "solve": true,
+    "export": true
+  },
+  "payload": {
+    "protocol_evidence_id": "protocol-fixture",
+    "method_id": "illustrative-mean-predictions",
+    "method_build_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "species": "PM2.5",
+    "units": "ug/m3",
+    "time_support": "interval_mean",
+    "predictions": [
+      {
+        "observation_id": "row-2",
+        "interval_start": "2026-10-10T04:29:30Z",
+        "interval_end": "2026-10-10T05:29:30Z",
+        "value_ug_m3": 24
+      }
+    ]
+  }
+}

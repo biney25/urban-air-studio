@@ -1,0 +1,312 @@
+{
+  "schema_version": "phase-b-qualification-requirements-v1",
+  "qualified": false,
+  "status": "requires_preregistered_protocol_and_executed_evidence",
+  "threshold_basis": "preserved_project_proposed_targets_not_industry_certification",
+  "gates": [
+    {
+      "gate_id": "runtime_identity",
+      "package": "B01",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "mesh_quality",
+      "package": "B02",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "source_assignment",
+      "package": "B02",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": {
+        "name": "relative_assignment_error",
+        "unit": "fraction",
+        "operator": "le",
+        "threshold": 0.001
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "receptor_support",
+      "package": "B02",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "abl_homogeneity",
+      "package": "B03",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "obstacle_wind_validation",
+      "package": "B03",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "independent_observation"
+      ],
+      "proposed_baseline_target": {
+        "name": "normalized_vector_rmse",
+        "unit": "fraction",
+        "operator": "le",
+        "threshold": 0.3
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "array_wind_validation",
+      "package": "B03",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "independent_observation"
+      ],
+      "proposed_baseline_target": {
+        "name": "normalized_vector_rmse",
+        "unit": "fraction",
+        "operator": "le",
+        "threshold": 0.3
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "scalar_no_source",
+      "package": "B04",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "scalar_uniform",
+      "package": "B04",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "scalar_manufactured",
+      "package": "B04",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "scalar_positivity",
+      "package": "B04",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "scalar_mass_balance",
+      "package": "B04",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": {
+        "name": "relative_mass_imbalance",
+        "unit": "fraction",
+        "operator": "lt",
+        "threshold": 0.01
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "flow_scalar_stationarity",
+      "package": "B04",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": {
+        "name": "relative_stationarity_drift",
+        "unit": "fraction",
+        "operator": "lt",
+        "threshold": 0.01
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "inventory_background",
+      "package": "B05",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "measurement_qc"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "campaign_qc",
+      "package": "B06",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "measurement_qc"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "mesh_sensitivity",
+      "package": "B07",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": {
+        "name": "relative_metric_change",
+        "unit": "fraction",
+        "operator": "lt",
+        "threshold": 0.05
+      },
+      "minimum_distinct_mesh_levels": 3
+    },
+    {
+      "gate_id": "domain_sensitivity",
+      "package": "B07",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": {
+        "name": "relative_metric_change",
+        "unit": "fraction",
+        "operator": "lt",
+        "threshold": 0.05
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "closure_sensitivity",
+      "package": "B07",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "tracer_validation",
+      "package": "B08",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "independent_observation"
+      ],
+      "proposed_baseline_target": {
+        "name": "FAC2",
+        "unit": "fraction",
+        "operator": "ge",
+        "threshold": 0.6
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "heldout_replay",
+      "package": "B08",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "heldout_observation"
+      ],
+      "proposed_baseline_target": {
+        "name": "FAC2",
+        "unit": "fraction",
+        "operator": "ge",
+        "threshold": 0.6
+      },
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "uncertainty_budget",
+      "package": "B08",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "uncertainty_analysis"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "paired_no_change",
+      "package": "B10",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_paired_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "paired_source_control",
+      "package": "B10",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_paired_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "protected_receptor_no_harm",
+      "package": "B10",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "native_paired_execution"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    },
+    {
+      "gate_id": "resource_calibration",
+      "package": "B12",
+      "state": "unexecuted",
+      "accepted_evidence_basis": [
+        "runtime_measurement"
+      ],
+      "proposed_baseline_target": null,
+      "minimum_distinct_mesh_levels": 1
+    }
+  ],
+  "independent_human_review_required": true,
+  "promotion_requirements": [
+    "trusted_execution_or_observation_issuer",
+    "actual_artifact_readback",
+    "method_runtime_compiler_input_protocol_envelope_identity",
+    "every_preregistered_case_and_regime",
+    "all_failed_attempts_retained",
+    "approved_scoped_independent_scientific_review"
+  ]
+}

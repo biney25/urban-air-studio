@@ -1,0 +1,5 @@
+# Exact CPython 3.13 wheels: Windows x64 and Linux glibc x64 only.
+# Install this lock with --only-binary=:all: --require-hashes before the API lock.
+cedarpy==4.12.0 \
+    --hash=sha256:ded1a8f80e1ae1ddec1ce308790f1facb9fb3065369df4c227759b6fe1606223 \
+    --hash=sha256:919186c88c60116f0e116b8a2e830fcae8247e66f83252faad12a0f128a0505e

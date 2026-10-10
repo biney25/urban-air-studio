@@ -1,0 +1,13 @@
+namespace UrbanAir {
+    entity User { tenant: String, projects: Set<String> };
+    entity Asset {
+        tenant: String,
+        project: String,
+        rights: { derive: Bool, solve: Bool, export: Bool }
+    };
+    action "derive", "solve", "export" appliesTo {
+        principal: User,
+        resource: Asset,
+        context: {}
+    };
+}

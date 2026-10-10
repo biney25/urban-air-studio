@@ -1,0 +1,580 @@
+[
+  {
+    "ecosystem": "python",
+    "name": "annotated-doc",
+    "version": "0.0.5",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/annotated-doc/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "annotated-types",
+    "version": "0.8.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/annotated-types/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "anyio",
+    "version": "4.15.1",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/anyio/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "boto3",
+    "version": "1.43.110",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/python/boto3/LICENSE",
+      "third_party/python/boto3/NOTICE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "botocore",
+    "version": "1.43.110",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/python/botocore/LICENSE.txt",
+      "third_party/python/botocore/NOTICE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "certifi",
+    "version": "2026.7.22",
+    "declared_license": "MPL-2.0",
+    "retained_license_files": [
+      "third_party/python/certifi/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "cedarpy",
+    "version": "4.12.0",
+    "declared_license": "See retained licence files",
+    "retained_license_files": [
+      "third_party/python/cedarpy/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "cffi",
+    "version": "2.1.1",
+    "declared_license": "MIT-0",
+    "retained_license_files": [
+      "third_party/python/cffi/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "click",
+    "version": "8.5.0",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/click/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "colorama",
+    "version": "0.4.6",
+    "declared_license": "See retained licence files",
+    "retained_license_files": [
+      "third_party/python/colorama/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "cryptography",
+    "version": "50.0.2",
+    "declared_license": "Apache-2.0 OR BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/cryptography/licenses/LICENSE",
+      "third_party/python/cryptography/licenses/LICENSE.APACHE",
+      "third_party/python/cryptography/licenses/LICENSE.BSD"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "fastapi",
+    "version": "0.143.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/fastapi/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "h11",
+    "version": "0.16.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/h11/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "httpcore",
+    "version": "1.0.9",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/httpcore/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "httpcore2",
+    "version": "2.13.1",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/httpcore2/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "httpx",
+    "version": "0.28.1",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/httpx/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "httpx2",
+    "version": "2.13.1",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/httpx2/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "idna",
+    "version": "3.20",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/idna/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "iniconfig",
+    "version": "2.3.1",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/iniconfig/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "jmespath",
+    "version": "1.1.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/jmespath/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "numpy",
+    "version": "2.5.3",
+    "declared_license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+    "retained_license_files": [
+      "third_party/python/numpy/licenses/LICENSE.txt",
+      "third_party/python/numpy/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "third_party/python/numpy/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "third_party/python/numpy/licenses/numpy/_core/src/highway/LICENSE",
+      "third_party/python/numpy/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+      "third_party/python/numpy/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/_core/src/umath/svml/LICENSE",
+      "third_party/python/numpy/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "third_party/python/numpy/licenses/numpy/ma/LICENSE",
+      "third_party/python/numpy/licenses/numpy/random/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/random/src/distributions/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/random/src/philox/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "third_party/python/numpy/licenses/numpy/random/src/splitmix64/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "opentelemetry-api",
+    "version": "1.45.1",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/python/opentelemetry-api/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "packaging",
+    "version": "26.3",
+    "declared_license": "Apache-2.0 OR BSD-2-Clause",
+    "retained_license_files": [
+      "third_party/python/packaging/licenses/LICENSE",
+      "third_party/python/packaging/licenses/LICENSE.APACHE",
+      "third_party/python/packaging/licenses/LICENSE.BSD"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "pluggy",
+    "version": "1.6.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/pluggy/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "psycopg",
+    "version": "3.3.6",
+    "declared_license": "LGPL-3.0-only",
+    "retained_license_files": [
+      "third_party/python/psycopg/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "psycopg-binary",
+    "version": "3.3.6",
+    "declared_license": "LGPL-3.0-only",
+    "retained_license_files": [
+      "third_party/python/psycopg-binary/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "pycparser",
+    "version": "3.1",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/pycparser/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "pydantic",
+    "version": "2.14.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/pydantic/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "pydantic_core",
+    "version": "2.50.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/pydantic_core/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "Pygments",
+    "version": "2.21.0",
+    "declared_license": "BSD-2-Clause",
+    "retained_license_files": [
+      "third_party/python/Pygments/licenses/AUTHORS",
+      "third_party/python/Pygments/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "PyJWT",
+    "version": "2.15.1",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/PyJWT/licenses/AUTHORS.rst",
+      "third_party/python/PyJWT/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "pyproj",
+    "version": "3.8.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/pyproj/licenses/LICENSE",
+      "third_party/python/pyproj/licenses/LICENSE_proj"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "pytest",
+    "version": "9.1.1",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/pytest/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "python-dateutil",
+    "version": "2.9.0.post0",
+    "declared_license": "Dual License",
+    "retained_license_files": [
+      "third_party/python/python-dateutil/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "s3transfer",
+    "version": "0.19.2",
+    "declared_license": "Apache License 2.0",
+    "retained_license_files": [
+      "third_party/python/s3transfer/LICENSE.txt",
+      "third_party/python/s3transfer/NOTICE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "scipy",
+    "version": "1.18.1",
+    "declared_license": "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.",
+    "retained_license_files": [
+      "third_party/python/scipy/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "shapely",
+    "version": "2.2.0",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/shapely/licenses/LICENSE.txt",
+      "third_party/python/shapely/licenses/LICENSE_GEOS",
+      "third_party/python/shapely/licenses/LICENSE_win32"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "six",
+    "version": "1.17.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/six/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "starlette",
+    "version": "1.7.0",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/starlette/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "truststore",
+    "version": "0.10.4",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/truststore/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "typing-inspection",
+    "version": "0.4.4",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/typing-inspection/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "declared_license": "PSF-2.0",
+    "retained_license_files": [
+      "third_party/python/typing_extensions/licenses/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "tzdata",
+    "version": "2026.5",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/python/tzdata/licenses/LICENSE",
+      "third_party/python/tzdata/licenses/licenses/LICENSE_APACHE"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "urllib3",
+    "version": "2.8.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/python/urllib3/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "python",
+    "name": "uvicorn",
+    "version": "0.54.0",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/python/uvicorn/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "@tanstack/react-query",
+    "version": "5.104.1",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/@tanstack/react-query/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "cesium",
+    "version": "1.146.0",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/node/cesium/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "lucide-react",
+    "version": "0.468.0",
+    "declared_license": "ISC",
+    "retained_license_files": [
+      "third_party/node/lucide-react/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "oidc-client-ts",
+    "version": "3.5.0",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/node/oidc-client-ts/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "react",
+    "version": "19.3.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/react/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "react-dom",
+    "version": "19.3.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/react-dom/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "react-router-dom",
+    "version": "7.18.4",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/react-router-dom/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "@types/node",
+    "version": "22.20.5",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/@types/node/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "@types/react",
+    "version": "19.3.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/@types/react/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "@types/react-dom",
+    "version": "19.3.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/@types/react-dom/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "@vitejs/plugin-react",
+    "version": "4.7.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/@vitejs/plugin-react/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "axe-core",
+    "version": "4.14.0",
+    "declared_license": "MPL-2.0",
+    "retained_license_files": [
+      "third_party/node/axe-core/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "prettier",
+    "version": "3.9.9",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/prettier/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "typescript",
+    "version": "5.9.3",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/node/typescript/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "vite",
+    "version": "6.4.4",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/vite/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "vitest",
+    "version": "5.0.3",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/vitest/LICENSE.md"
+    ]
+  }
+]

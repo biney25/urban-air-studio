@@ -1,0 +1,324 @@
+{
+  "type": "FeatureCollection",
+  "name": "Fictional campus — integration fixture",
+  "synthetic": true,
+  "evidence_kind": "illustrative",
+  "origin_hint": {
+    "longitude": 77.215,
+    "latitude": 28.612
+  },
+  "description": "All shapes, rates and receptors are fictional. Approximate Delhi coordinates provide map orientation only. No pilot site, customer, survey or accuracy is claimed.",
+  "source_id": "synthetic-campus-v1",
+  "licence_id": "project-generated-synthetic-fixture-v1",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "building_west",
+      "properties": {
+        "id": "building_west",
+        "name": "West teaching block",
+        "kind": "building",
+        "height_m": 20,
+        "height_unit": "m",
+        "evidence_kind": "illustrative",
+        "provenance": "invented integration fixture; not an actual surveyed asset"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21401841214647,
+              28.611819538896967
+            ],
+            [
+              77.21442740708544,
+              28.611819541241065
+            ],
+            [
+              77.21442740395368,
+              28.61239700538374
+            ],
+            [
+              77.21401840677775,
+              28.612397003039614
+            ],
+            [
+              77.21401841214647,
+              28.611819538896967
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "building_north",
+      "properties": {
+        "id": "building_north",
+        "name": "North library block",
+        "kind": "building",
+        "height_m": 28,
+        "height_unit": "m",
+        "evidence_kind": "illustrative",
+        "provenance": "invented integration fixture; not an actual surveyed asset"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21475460161055,
+              28.61243309787802
+            ],
+            [
+              77.21549079677892,
+              28.6124330972118
+            ],
+            [
+              77.21549079812112,
+              28.612721829263144
+            ],
+            [
+              77.21475460093944,
+              28.612721829929374
+            ],
+            [
+              77.21475460161055,
+              28.61243309787802
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "building_east",
+      "properties": {
+        "id": "building_east",
+        "name": "East research block",
+        "kind": "building",
+        "height_m": 16,
+        "height_unit": "m",
+        "evidence_kind": "illustrative",
+        "provenance": "invented integration fixture; not an actual surveyed asset"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21557259330604,
+              28.611891724261596
+            ],
+            [
+              77.21598158852463,
+              28.611891721917488
+            ],
+            [
+              77.21598159389336,
+              28.61246918605399
+            ],
+            [
+              77.21557259643781,
+              28.612469188398112
+            ],
+            [
+              77.21557259330604,
+              28.611891724261596
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "building_south",
+      "properties": {
+        "id": "building_south",
+        "name": "South workshop",
+        "kind": "building",
+        "height_m": 12,
+        "height_unit": "m",
+        "evidence_kind": "illustrative",
+        "provenance": "invented integration fixture; not an actual surveyed asset"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2147137050107,
+              28.611278169469387
+            ],
+            [
+              77.21528629498931,
+              28.611278169469387
+            ],
+            [
+              77.21528629577224,
+              28.611566901569955
+            ],
+            [
+              77.21471370422778,
+              28.611566901569955
+            ],
+            [
+              77.2147137050107,
+              28.611278169469387
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "source_west",
+      "properties": {
+        "id": "source_west",
+        "name": "Fictional low release W",
+        "kind": "source",
+        "z": 2.0,
+        "height_unit": "m",
+        "rate_g_s": 0.012,
+        "rate_unit": "g/s",
+        "evidence_kind": "illustrative",
+        "provenance": "invented passive tracer rate; not traffic or PM emissions"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.21373211785625,
+          28.611639078967357
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "source_east",
+      "properties": {
+        "id": "source_east",
+        "name": "Fictional low release E",
+        "kind": "source",
+        "z": 2.0,
+        "height_unit": "m",
+        "rate_g_s": 0.006,
+        "rate_unit": "g/s",
+        "evidence_kind": "illustrative",
+        "provenance": "invented passive tracer rate; not traffic or PM emissions"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.21626788214377,
+          28.611639078967357
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "gate_west",
+      "properties": {
+        "id": "gate_west",
+        "name": "West arrival gate",
+        "kind": "receptor",
+        "z": 1.5,
+        "height_unit": "m",
+        "protected": true,
+        "evidence_kind": "illustrative",
+        "provenance": "invented receptor; no measured occupancy or observation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.21385481143062,
+          28.612072178182334
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "courtyard",
+      "properties": {
+        "id": "courtyard",
+        "name": "Central courtyard",
+        "kind": "receptor",
+        "z": 1.5,
+        "height_unit": "m",
+        "protected": true,
+        "evidence_kind": "illustrative",
+        "provenance": "invented receptor; no measured occupancy or observation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.215,
+          28.612
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "gate_east",
+      "properties": {
+        "id": "gate_east",
+        "name": "East arrival gate",
+        "kind": "receptor",
+        "z": 1.5,
+        "height_unit": "m",
+        "protected": true,
+        "evidence_kind": "illustrative",
+        "provenance": "invented receptor; no measured occupancy or observation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.21614518856939,
+          28.612072178182334
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "neighbour_north",
+      "properties": {
+        "id": "neighbour_north",
+        "name": "Protected north neighbour",
+        "kind": "receptor",
+        "z": 1.5,
+        "height_unit": "m",
+        "protected": true,
+        "evidence_kind": "illustrative",
+        "provenance": "invented receptor; no measured occupancy or observation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.21512269990778,
+          28.613046653638992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "raised_reference",
+      "properties": {
+        "id": "raised_reference",
+        "name": "Raised fictional reference",
+        "kind": "receptor",
+        "z": 10,
+        "height_unit": "m",
+        "protected": true,
+        "evidence_kind": "illustrative",
+        "provenance": "invented receptor; no measured occupancy or observation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.215,
+          28.61221654905351
+        ]
+      }
+    }
+  ]
+}
