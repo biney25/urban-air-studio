@@ -287,6 +287,8 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
         if fresh:
             response.set_cookie(COOKIE, signed(sid, sessions[sid]["expires"]), max_age=limits.session_seconds,
                                 secure=True, httponly=True, samesite="lax", path="/")
+        elif response.status_code == 401 and sid is None:
+            response.delete_cookie(COOKIE, secure=True, httponly=True, samesite="lax", path="/")
         response.headers.update({"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
             "Referrer-Policy": "no-referrer", "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
             "Strict-Transport-Security": "max-age=31536000", "X-Frame-Options": "DENY"})

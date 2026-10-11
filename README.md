@@ -177,4 +177,6 @@ and original product reference documents remain local.
 
 ## Free public demonstration
 
+Live demo: https://urban-air-studio.onrender.com
+
 Render Free hosting runs the frontend, API, real Cedar and bounded T1 worker with isolated anonymous browser sessions. Its data is temporary and resets on sleep/restart. Native OpenFOAM and local AI remain in the local edition. See [deployment and limitations](docs/free-public-deployment.md).

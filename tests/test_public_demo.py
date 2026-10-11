@@ -72,7 +72,9 @@ def test_cookie_security_tampering_origin_and_review_no_fallback(tmp_path):
         assert client.get("/api/projects").json() == []
         client.cookies.clear()
         client.cookies.set(COOKIE, token[:-1] + ("0" if token[-1] != "0" else "1"))
-        assert client.get("/api/projects").status_code == 401
+        invalid = client.get("/api/projects")
+        assert invalid.status_code == 401
+        assert "Max-Age=0" in invalid.headers["set-cookie"]
 
 
 def test_resource_caps_and_real_fixture_quote(tmp_path):
