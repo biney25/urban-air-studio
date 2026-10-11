@@ -59,7 +59,7 @@
   "infra/Dockerfile.public-demo.dockerignore": "4475e8405f03c8810023f7e7fac8dacbe59c14265c067a93a62c52c5757a690c",
   "infra/postgres/app-v1.sql": "03def830df2e4a61f848a4728d34fb84b6f691414cf411499d0ce0c4e4e66c3e",
   "infra/postgres/init.sql": "c40a88de38f25e9b9dce9d1d2d7e23510acbdcb1111fd58d707ecf206ea21d32",
-  "infra/public_demo.py": "7573b6728cbeb99b3cd3bab67ea0ec9c438083f22c72efac03c95ec91a6ede6f",
+  "infra/public_demo.py": "91b42cc2afd1620d0c6b9444958b67527e0b0039ab06c7e6ba5f839b9501a5f2",
   "render.yaml": "e0c5eb92f5f53051eef57abdaeec55880755e6b312dd82f5b3393c9472c9e086",
   "science/__init__.py": "264de0cd2ac822a955590be912cdf90a9eac021fa86a90b5edfc345e63b10304",
   "science/errors.py": "70f40fb9ea1b78363820a7628e866c080e1cf2c60e52d6411935e98e4064eaf9",

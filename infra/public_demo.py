@@ -341,18 +341,23 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
     @app.get("/api/capabilities")
     def capabilities(identity=Depends(demo_identity)):
         from science import MODEL_VERSION
+        gemini_ready = bool(os.getenv("GEMINI_API_KEY"))
+        storage_kind = getattr(store, "adapter_name", "ephemeral_demo_sqlite")
         return {"phase": "Isolated public research demo", "model_version": MODEL_VERSION,
             "supported_tiers": ["T0", "T1"], "capability_statuses": {"T0": "implemented_geometry_diagnostics", "T1": "research_preview_unvalidated", "T2": "not_hosted_on_free_demo"},
             "species": ["passive_tracer"], "imports": ["GeoJSON Polygon/Point"], "identity": "anonymous_browser_session",
-            "storage": "ephemeral_demo_sqlite", "operator_views_available": False, "ai_available": False,
-            "study_assistant": {"state": "unavailable", "scope": "not hosted on free demo", "qualified": False},
+            "storage": storage_kind, "operator_views_available": False, "ai_available": gemini_ready,
+            "study_assistant": {"state": "ready" if gemini_ready else "unavailable", "scope": "reviewed study tools via Gemini" if gemini_ready else "not hosted on free demo", "qualified": False},
             "cloud_deployed": False, "validated": False,
             "geographic_context": {"map_navigation": "Supported worldwide coordinates", "providers": ["OSM geometry", "Open-Meteo GFS weather context"], "semantic_preparation": "review_required", "national_scientific_coverage": False},
-            "limitations": ["Ephemeral anonymous demo; no accounts or production cloud assurance", "T1 research previews are scientifically unvalidated", "Native CFD and local AI are not hosted"]}
+            "limitations": ["Ephemeral anonymous demo; no accounts or production cloud assurance", "T1 research previews are scientifically unvalidated", "Native CFD is not hosted; case download available"]}
 
     @app.get("/api/projects/{project_id}/assistant/status")
     def assistant_status(project_id: str, identity=Depends(demo_identity)):
         required(store, "project", project_id, identity)
+        if os.getenv("GEMINI_API_KEY"):
+            from api.assistant import LocalModel
+            return LocalModel().status()
         return {"available": False, "state": "unavailable", "label": "Study assistant",
             "model": {"provider": "ollama", "model_id": "qwen3:1.7b"}, "limits": {},
             "reason_code": "DEMO_RUNTIME_NOT_HOSTED", "message": "Local AI is not hosted on this free demo; ordinary study tools remain available", "qualified": False, "evaluation": None}
