@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: urban-air-studio
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./infra/Dockerfile.public-demo
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: UA_DEMO_DATA_DIR
+        value: /tmp/uas-public-demo
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"
+      - key: OMP_NUM_THREADS
+        value: "1"

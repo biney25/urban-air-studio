@@ -174,3 +174,7 @@ commits and public increments retain their actual dates. Checkpoints supplement
 provenance without recreating missing history. This new candidate is unpublished
 until its exact audit and owner approval are complete. Private development data
 and original product reference documents remain local.
+
+## Free public demonstration
+
+Render Free hosting runs the frontend, API, real Cedar and bounded T1 worker with isolated anonymous browser sessions. Its data is temporary and resets on sleep/restart. Native OpenFOAM and local AI remain in the local edition. See [deployment and limitations](docs/free-public-deployment.md).

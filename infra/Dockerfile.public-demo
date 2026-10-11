@@ -1,0 +1,25 @@
+FROM node:22-bookworm-slim AS web
+WORKDIR /build/web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY web ./
+RUN npm run build
+
+FROM python:3.13.7-slim
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 UA_MODE=local \
+    UA_DEMO_DATA_DIR=/tmp/uas-public-demo OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+COPY api/requirements.lock api/cedar-requirements.lock ./
+RUN pip install --no-cache-dir --no-deps --only-binary=:all: --require-hashes -r cedar-requirements.lock \
+    && pip install --no-cache-dir --only-binary=:all: -r requirements.lock \
+    && useradd --system --uid 10001 urban
+COPY api ./api
+COPY science ./science
+COPY datasets ./datasets
+COPY evidence ./evidence
+COPY third_party ./third_party
+COPY infra/public_demo.py ./infra/public_demo.py
+COPY --from=web /build/web/dist ./web/dist
+USER 10001
+EXPOSE 10000
+CMD ["python", "-m", "infra.public_demo"]
