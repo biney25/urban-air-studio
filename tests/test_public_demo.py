@@ -88,6 +88,9 @@ def test_resource_caps_and_real_fixture_quote(tmp_path):
         submission = {"quote_id": quote.json()["id"], "idempotency_key": "public-demo-test-run"}
         submitted = client.post(f"/api/projects/{project['id']}/runs", json=submission)
         assert submitted.status_code == 202, submitted.text
+        repeated = client.post(f"/api/projects/{project['id']}/runs", json=submission)
+        assert repeated.status_code == 202
+        assert [r["id"] for r in repeated.json()["runs"]] == [r["id"] for r in submitted.json()["runs"]]
         # A second pending run cannot bypass the global cap through another browser.
         with browser(app) as second:
             project2, scenario2 = seed(second)

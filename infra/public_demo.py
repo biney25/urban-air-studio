@@ -183,6 +183,14 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
 
     def capacity(path, sid, body):
         tenant = "demo:" + sid
+        submitted = re.fullmatch(r"/api/projects/([^/]+)/runs", path)
+        if submitted and isinstance(body.get("idempotency_key"), str):
+            with closing(store.connect()) as db:
+                if db.execute("SELECT 1 FROM submissions WHERE tenant_id=? AND project_id=? AND key=?",
+                              (tenant, submitted.group(1), body["idempotency_key"])).fetchone():
+                    # The API checks the quote hash and returns existing IDs (or a
+                    # conflict). Recovering a submission consumes no new capacity.
+                    return None
         if size(directory) >= limits.storage_bytes - limits.artifact_bytes:
             return problem("DEMO_STORAGE_CAP", "Temporary demo storage is full; try after the next reset")
         with closing(store.connect()) as db:
