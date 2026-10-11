@@ -164,3 +164,74 @@ def test_real_t1_worker_starts_and_commits_fixture(tmp_path, monkeypatch):
         assert status["result"]["diagnostics"]["numerical_verification_passed"] is True
         assert app.state.demo_worker.is_alive()
     assert not app.state.demo_worker.is_alive()
+
+
+def test_detailed_case_compilation_and_download_in_public_demo(tmp_path):
+    app = app_at(tmp_path)
+    case_config = {
+        "wind_from_deg": 270, "reference_speed_m_s": 3, "reference_height_m": 10,
+        "roughness_length_m": 0.1, "kinematic_viscosity_m2_s": 1.5e-5,
+        "molecular_diffusivity_m2_s": 1e-5, "turbulent_schmidt_number": 0.7, "background_ug_m3": 10
+    }
+    with browser(app) as client:
+        project, scenario = seed(client)
+        # Detailed case compilation is pure Python and enabled in public demo
+        create_res = client.post(
+            f"/api/projects/{project['id']}/detailed-cases",
+            json={
+                "scenario_id": scenario["id"],
+                "expected_version": scenario["version"],
+                "title": "Public demo compiled case",
+                "config": case_config
+            }
+        )
+        assert create_res.status_code == 201, create_res.text
+        case_data = create_res.json()
+        assert case_data["schema_version"] == "phase-b-case-v1"
+        assert case_data["status"] == "prepared_unexecuted"
+        assert case_data["file_count"] > 0
+
+        # Downloading the compiled OpenFOAM bundle (.zip) works
+        dl_res = client.get(f"/api/projects/{project['id']}/detailed-cases/{case_data['id']}/download")
+        assert dl_res.status_code == 200
+        assert dl_res.headers.get("content-type") == "application/zip"
+        assert len(dl_res.content) > 1000
+
+        # Actual native Linux solver execution is still intercepted with clear 503
+        exec_res = client.post(f"/api/projects/{project['id']}/detailed-executions", json={})
+        assert exec_res.status_code == 503
+        assert exec_res.json()["detail"]["code"] == "DEMO_RUNTIME_NOT_HOSTED"
+
+
+def test_session_persists_across_restart(tmp_path):
+    app1 = app_at(tmp_path)
+    cookie_value = None
+    with browser(app1) as client1:
+        project, _ = seed(client1)
+        cookie_value = client1.cookies.get(COOKIE)
+        assert cookie_value is not None
+        projects = client1.get("/api/projects").json()
+        assert len(projects) == 1
+        assert projects[0]["id"] == project["id"]
+
+    # Simulate restart by creating app2 at same directory
+    app2 = app_at(tmp_path)
+    with browser(app2) as client2:
+        client2.cookies.set(COOKIE, cookie_value)
+        reopened = client2.get("/api/projects")
+        assert reopened.status_code == 200
+        data = reopened.json()
+        assert len(data) == 1
+        assert data[0]["id"] == project["id"]
+
+
+def test_assistant_unblocked_when_gemini_key_configured(tmp_path, monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key-public-demo")
+    app = app_at(tmp_path)
+    with browser(app) as client:
+        project, _ = seed(client)
+        # With GEMINI_API_KEY configured, public demo does NOT return 503 DEMO_RUNTIME_NOT_HOSTED
+        res = client.post(f"/api/projects/{project['id']}/assistant/messages", json={"message": "Inspect"})
+        assert res.status_code != 503
+
+

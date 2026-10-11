@@ -14,7 +14,7 @@ class AssistantMessage(Input):
 
 
 class AssistantModel(Output):
-    provider: Literal["ollama"] = "ollama"
+    provider: Literal["ollama", "gemini"] = "ollama"
     model_id: str
 
 

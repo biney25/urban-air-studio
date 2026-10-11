@@ -93,9 +93,9 @@ class PostgresStore(Store):
         return object.__new__(cls)
 
     def __init__(self, directory=None, database_url=None, artifacts=None, auto_migrate=False):
-        self.database_url = database_url or os.environ["UA_DATABASE_URL"]
-        if not self.database_url.startswith(("postgresql://", "postgres://")):
-            raise ValueError("UA_DATABASE_URL must select PostgreSQL")
+        self.database_url = database_url or os.environ.get("UA_DATABASE_URL") or os.environ.get("DATABASE_URL")
+        if not self.database_url or not self.database_url.startswith(("postgresql://", "postgres://")):
+            raise ValueError("UA_DATABASE_URL or DATABASE_URL must select PostgreSQL")
         self.directory = Path(directory or os.getenv("UA_DATA_DIR", "runtime/local")).resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
         self.artifacts = artifacts
@@ -117,9 +117,11 @@ class PostgresStore(Store):
         options = {"connect_timeout":10, "autocommit":True, "row_factory":dict_row,
                    "options":"-c statement_timeout=15000 -c lock_timeout=15000"}
         if os.getenv("UA_MODE", "local") != "local":
-            options["sslmode"] = "verify-full"
             if os.getenv("UA_DB_SSLROOTCERT"):
                 options["sslrootcert"] = os.environ["UA_DB_SSLROOTCERT"]
+                options["sslmode"] = "verify-full"
+            elif "sslmode=" not in self.database_url:
+                options["sslmode"] = "require"
         connection = psycopg.connect(self.database_url, **options)
         connection.execute("SELECT set_config('search_path', 'urban, public', false)")
         return Connection(connection)
@@ -173,7 +175,7 @@ def main():
     parser.parse_args()
     # Construct only the connection configuration, then apply/check the migration.
     store = object.__new__(PostgresStore)
-    store.database_url = os.environ["UA_DATABASE_URL"]
+    store.database_url = os.environ.get("UA_DATABASE_URL") or os.environ["DATABASE_URL"]
     store.migrate()
     print(json.dumps({"event":"database_migrated", "schema_version":SCHEMA_VERSION}))
 

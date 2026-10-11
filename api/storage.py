@@ -33,7 +33,7 @@ def new_id(prefix):
 class Store:
     def __new__(cls, directory=None):
         # Explicit directories always select local storage for isolated tests/tools.
-        if cls is Store and directory is None and os.getenv("UA_DATABASE_URL"):
+        if cls is Store and directory is None and (os.getenv("UA_DATABASE_URL") or os.getenv("DATABASE_URL")):
             from api.postgres import PostgresStore
             return object.__new__(PostgresStore)
         return super().__new__(cls)

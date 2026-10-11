@@ -103,7 +103,22 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
                 raise OSError("Public demo artifact storage allowance reached")
             return super().atomic_artifact(run_id, fence, payload)
 
-    store = DemoStore(directory)
+    database_url = os.getenv("UA_DATABASE_URL") or os.getenv("DATABASE_URL")
+    if database_url and database_url.startswith(("postgresql://", "postgres://")):
+        try:
+            from api.postgres import PostgresStore
+            class DemoPostgresStore(PostgresStore):
+                def atomic_artifact(self, run_id, fence, payload):
+                    encoded = canonical(payload).encode("utf-8")
+                    if len(encoded) > limits.artifact_bytes or size(directory) + len(encoded) > limits.storage_bytes:
+                        raise OSError("Public demo artifact storage allowance reached")
+                    return super().atomic_artifact(run_id, fence, payload)
+            store = DemoPostgresStore(directory, database_url=database_url, auto_migrate=True)
+        except Exception as exc:
+            logging.getLogger(__name__).warning("DemoPostgresStore fallback: %s", exc)
+            store = DemoStore(directory)
+    else:
+        store = DemoStore(directory)
     app = api_app(directory)
     app.state.store = store
     app.state.demo_limits = limits
@@ -145,7 +160,21 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
             await asyncio.to_thread(thread.join, 3)
 
     app.router.lifespan_context = lifespan
-    secret = secrets.token_bytes(32)  # Restart expires all anonymous identities.
+    secret_file = directory / ".demo-secret"
+    secret_env = os.getenv("UA_DEMO_SECRET") or os.getenv("SECRET_KEY")
+    if secret_env:
+        secret = hashlib.sha256(secret_env.encode("utf-8")).digest()
+    elif secret_file.exists():
+        try:
+            secret = secret_file.read_bytes()
+        except OSError:
+            secret = secrets.token_bytes(32)
+    else:
+        secret = secrets.token_bytes(32)
+        try:
+            secret_file.write_bytes(secret)
+        except OSError:
+            pass
     sessions = {}
     global_requests = deque()
     write_lock = asyncio.Lock()  # Admission plus mutation is atomic in one process.
@@ -164,8 +193,10 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
             if not re.fullmatch(r"[0-9a-f]{48}\.[0-9]{10}\.[0-9a-f]{64}", token):
                 return None, False, problem("DEMO_SESSION_INVALID", "Demo cookie is invalid; clear it and reopen the demo", 401)
             sid, expires, _ = token.split(".")
-            if not hmac.compare_digest(token, signed(sid, expires)) or sid not in sessions or sessions[sid]["expires"] != int(expires):
+            if not hmac.compare_digest(token, signed(sid, expires)) or int(expires) <= now:
                 return None, False, problem("DEMO_SESSION_INVALID", "Demo session expired; clear the cookie and reopen the demo", 401)
+            if sid not in sessions:
+                sessions[sid] = {"expires": int(expires), "requests": deque(), "writes": deque()}
             return sid, False, None
         if len(sessions) >= limits.sessions:
             return None, False, problem("DEMO_SESSION_CAP", "The public demo session allowance is full; try after the next reset")
@@ -258,8 +289,8 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
                 request.state.demo_session = sid
                 if not rate(sessions[sid]["requests"], limits.requests_per_minute, now) or (mutating and not rate(sessions[sid]["writes"], limits.writes_per_minute, now)):
                     response = problem("DEMO_RATE_LIMIT", "This browser's demo allowance is full; retry in a minute")
-        if response is None and mutating and ("/detailed-executions" in path or path.endswith("/detailed-cases") or "/assistant/" in path):
-            response = problem("DEMO_RUNTIME_NOT_HOSTED", "Native CFD and local AI execution are not hosted on this free T1 demo", 503)
+        if response is None and mutating and ("/detailed-executions" in path or (not os.getenv("GEMINI_API_KEY") and "/assistant/" in path)):
+            response = problem("DEMO_RUNTIME_NOT_HOSTED", "Native CFD solver execution and local AI inference are not hosted on this free T1 demo", 503)
         if response is None:
             if mutating:
                 # Bound the actual body here, before the API's larger local limit.
