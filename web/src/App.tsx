@@ -101,7 +101,7 @@ function Projects({ create = false }: { create?: boolean }) {
       api<Project>("/projects", {
         name: name.trim(),
         category: "user",
-        planning_question: question.trim(),
+        ...(question.trim() ? { planning_question: question.trim() } : {}),
         ...(selectedArea
           ? {
               site: {
@@ -235,10 +235,8 @@ function Projects({ create = false }: { create?: boolean }) {
                 />
               </label>
               <label className="form-label">
-                What decision are you comparing?
+                What would you like to compare? (optional)
                 <textarea
-                  required
-                  minLength={8}
                   maxLength={1000}
                   value={question}
                   onChange={(event) => setQuestion(event.target.value)}
@@ -284,11 +282,7 @@ function Projects({ create = false }: { create?: boolean }) {
               <button
                 data-testid="create-project"
                 className="button primary"
-                disabled={
-                  mutation.isPending ||
-                  name.trim().length < 2 ||
-                  question.trim().length < 8
-                }
+                disabled={mutation.isPending}
               >
                 {mutation.isPending
                   ? "Creating…"
