@@ -9,6 +9,8 @@
 !evidence/**
 !third_party/
 !third_party/**
+!contracts/
+!contracts/**
 !infra/
 !infra/public_demo.py
 !web/

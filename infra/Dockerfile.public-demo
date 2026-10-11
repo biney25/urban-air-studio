@@ -3,6 +3,7 @@ WORKDIR /build/web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY web ./
+COPY contracts /build/contracts
 RUN npm run build
 
 FROM python:3.13.7-slim
@@ -18,6 +19,7 @@ COPY science ./science
 COPY datasets ./datasets
 COPY evidence ./evidence
 COPY third_party ./third_party
+COPY contracts ./contracts
 COPY infra/public_demo.py ./infra/public_demo.py
 COPY --from=web /build/web/dist ./web/dist
 USER 10001
