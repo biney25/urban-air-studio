@@ -1,6 +1,6 @@
 # Deployed demo versus local Urban Air Studio
 
-Comparison checked against the current application routers, `infra/public_demo.py`, and the Docker build on 11 October 2026. The hosted edition runs the same frontend, API and T1 science code through a separate resource-limited deployment wrapper. Having an API route present does not mean its external data, runtime or scientific qualification is available.
+Comparison checked against the current application routers, `infra/public_demo.py`, and the Docker build on 11 October 2026. The hosted edition runs the same frontend, API and T1 science code through a separate resource-limited deployment wrapper. Having an API route present does not mean its external data, runtime or scientific qualification is available. Late Gemini changes enable pure-Python case preparation and an optional Google Gemini REST assistant. These do not host native CFD or the local Strands/Ollama runtime. Persistence must be verified separately for metadata, cookies and artifacts.
 
 The reported Create project failure was a shared frontend defect: the form silently disabled submission below eight planning-question characters even though the API accepts one character or an omitted question. The fix makes this question optional and leaves browser validation and API errors visible; it does not substitute an invented planning goal.
 
@@ -23,9 +23,9 @@ The reported Create project failure was a shared frontend defect: the form silen
 | Detailed CFD execution, retry/cancel, native diagnostics/receipts/artifact downloads | Uses the installed WSL/OpenFOAM worker; diagnostic, scientifically unqualified | No OpenFOAM/WSL runtime on 512 MB free container. Execution mutations return `DEMO_RUNTIME_NOT_HOSTED`. (Use `scripts/tunnel_demo.py` for full parity via local WSL worker) |
 | Strands assistant, scoped model/tool calls, proposals and retained conversations | Local Ollama/Qwen model and Strands runtime | Enabled via Google Gemini cloud inference when `GEMINI_API_KEY` is configured; domain tools and evidence validation remain server-authoritative. Returns `DEMO_RUNTIME_NOT_HOSTED` only if unconfigured |
 | Finite source-control response studies: preview/create/list/retrieve/compare | Implemented bounded enumeration, not qualified optimisation | Same endpoints; requested cases must fit the T1 caps. Studies requesting more than two cases in one quote are rejected explicitly |
-| Frozen report review links, expiry/revocation and anchored comments | Implemented possession-scoped review | Same endpoints within current store. A link cannot survive a reset and is not verified reviewer identity |
+| Frozen report review links, expiry/revocation and anchored comments | Implemented possession-scoped review | Same endpoints within current store. Review access depends on retained database records and its bounded credential expiry; it is not verified reviewer identity |
 | Authorization and isolation | Local development identity; prepared Cognito mode; real Cedar permission checks | Signed Secure/HttpOnly browser session, tenant isolation, same-origin writes and real Cedar checks; no personal login or verified organisation membership |
-| Storage, previous projects and evidence | Persistent local SQLite/artifacts; prepared PostgreSQL/PostGIS/S3 adapters | Bounded SQLite/files by default; durable PostgreSQL/PostGIS enabled when `DATABASE_URL` is configured. Browser sessions persist across process restarts |
+| Storage, previous projects and evidence | Persistent local SQLite/artifacts; prepared PostgreSQL/PostGIS/S3 adapters | Bounded SQLite/files by default; durable PostgreSQL/PostGIS enabled when `DATABASE_URL` is configured. Session recovery across container replacement requires a stable signing secret; artifact files remain temporary without a separate durable adapter |
 | Operator/settings and production services | Production controls require configured deployment; some operator views available locally | Operator views hidden. No hosted Cognito, AWS managed services, queue service, autoscaling or accepted production monitoring/recovery system |
 
 ## Exact public resource limits
@@ -33,7 +33,7 @@ The reported Create project failure was a shared frontend defect: the form silen
 - Per browser: eight projects, twelve cumulative T1 cases until reset, two active cases, 250 stored objects, 120 requests/minute and twenty writes/minute. The run limit counts completed/failed cases as well as active cases; retry is a new case unless recovering an existing idempotent submission.
 - Per quote: two scenarios, 60,000 grid cells maximum per scenario and 120 simulated seconds. Geometry is not silently coarsened to fit.
 - Shared service: one T1 worker, four active cases, 100 cumulative cases until reset, 4,000 objects, 1,000 sessions, 600 requests/minute and 128 MB temporary storage. Individual artifact maximum 4 MB.
-- Each request body is at most 1 MB. Browser sessions expire after 24 hours. Cold sleep is prevented when an automated 10-minute ping (e.g. cron-job.org) targets `/api/health`. When `DATABASE_URL` is configured, project data persists across service restarts. Download reports before leaving.
+- Each request body is at most 1 MB. Browser sessions expire after 24 hours. A stable server signing secret is required to recover those sessions after container replacement. PostgreSQL metadata is persistent only after a successful connection; fallback SQLite is temporary. Simulation/case bytes remain temporary unless durable artifact storage is separately configured. Keep-alive pings are not a guarantee of continuous availability. Download reports before leaving.
 
 ## Gaps shared by both editions
 
@@ -41,4 +41,4 @@ Neither edition is the complete original production blueprint: validated PM/AQI 
 
 ## Verification boundaries
 
-The existing hosted verification proves actual import/baseline/edit/T1/compare/HTML+JSON report and Cedar Allow/Deny, plus successful map rendering. Routes that were preserved by the wrapper are identified above from source inspection; this does not claim every preserved preparation/review endpoint received a new hosted end-to-end test. Native CFD and AI are explicitly absent, and external-provider availability remains a genuine limitation.
+The earlier hosted verification proves actual import/baseline/edit/T1/compare/HTML+JSON report and Cedar Allow/Deny, plus successful map rendering. Late case compilation/Gemini/storage changes require a fresh hosted verification receipt; configured status alone is not that proof. Routes preserved by the wrapper are identified above from source inspection, not every-endpoint end-to-end testing. Native CFD and local Strands/Ollama remain absent; external-provider availability and optional cloud inference remain operational dependencies.

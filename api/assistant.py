@@ -75,8 +75,8 @@ def discover_gemini_model(api_key: str) -> str:
     if not api_key:
         return "gemini-2.0-flash"
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
-        req = urllib.request.Request(url, headers={"Content-Type": "application/json"}, method="GET")
+        url = "https://generativelanguage.googleapis.com/v1beta/models"
+        req = urllib.request.Request(url, headers={"Content-Type": "application/json", "x-goog-api-key": api_key}, method="GET")
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         models = data.get("models", [])
@@ -107,7 +107,7 @@ def discover_gemini_model(api_key: str) -> str:
             _DISCOVERED_MODEL = chosen
             return chosen
     except Exception as exc:
-        logging.getLogger(__name__).warning("Gemini model discovery error: %s", exc)
+        logging.getLogger(__name__).warning("Gemini model discovery failed (%s)", type(exc).__name__)
 
     return "gemini-2.0-flash"
 
@@ -116,7 +116,7 @@ class GeminiModel:
     prompt_version = "study-assistant-gemini-20261011"
 
     def __init__(self, api_key=None, model_id=None):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
+        self.api_key = os.getenv("GEMINI_API_KEY", "") if api_key is None else api_key
         self.explicit_model = bool(model_id)
         self.model_id = model_id or os.getenv("GEMINI_MODEL") or _DISCOVERED_MODEL or "gemini-2.0-flash"
         self.model_dict = {"provider": "gemini", "model_id": self.model_id}
@@ -129,10 +129,10 @@ class GeminiModel:
             self.model_dict["model_id"] = discovered
         busy = ready and _GATE.locked()
         evaluation = {
-            "actual_inference_gate": "passed" if ready else "unavailable",
-            "full_40_task_gate": True if ready else False,
+            "actual_inference_gate": "not_evaluated" if ready else "unavailable",
+            "full_40_task_gate": False,
             "scope": "Selected-study inspection, geometry, reviewed proposals and matched comparison",
-            "receipt_id": "gemini-cloud-assistant",
+            "receipt_id": None,
         }
         return {
             "available": ready and not busy,
@@ -141,7 +141,7 @@ class GeminiModel:
             "model": self.model_dict,
             "limits": LIMITS,
             "reason_code": "LOCAL_MODEL_BUSY" if busy else None if ready else "LOCAL_MODEL_UNAVAILABLE",
-            "message": "The assistant is busy; try again shortly" if busy else "Study assistant is ready via Google Gemini cloud inference" if ready else "Cloud Gemini API key is not configured",
+            "message": "The assistant is busy; try again shortly" if busy else "Gemini is configured; responses depend on model availability and provider quota" if ready else "Cloud Gemini API key is not configured",
             "qualified": False,
             "evaluation": evaluation,
         }
@@ -199,11 +199,13 @@ class GeminiModel:
             data = None
             last_err = None
             for candidate in candidates_to_try:
-                candidate_url = f"https://generativelanguage.googleapis.com/v1beta/models/{candidate}:generateContent?key={self.api_key}"
+                if time.monotonic() >= deadline:
+                    raise LocalModelUnavailable("LOCAL_MODEL_TIMEOUT")
+                candidate_url = f"https://generativelanguage.googleapis.com/v1beta/models/{candidate}:generateContent"
                 req = urllib.request.Request(
                     candidate_url,
                     data=json.dumps(body).encode("utf-8"),
-                    headers={"Content-Type": "application/json"},
+                    headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key},
                     method="POST",
                 )
                 try:
@@ -215,13 +217,12 @@ class GeminiModel:
                             self.model_dict["model_id"] = candidate
                         break
                 except urllib.error.HTTPError as exc:
-                    err_detail = exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else str(exc)
-                    last_err = f"GEMINI_HTTP_{exc.code}: {err_detail[:300]}"
+                    last_err = f"GEMINI_HTTP_{exc.code}"
                     if exc.code == 404 and turn == 0 and len(candidates_to_try) > 1:
                         continue
                     raise LocalModelUnavailable(last_err)
                 except Exception as exc:
-                    raise LocalModelUnavailable(f"GEMINI_CALL_FAILED: {exc}")
+                    raise LocalModelUnavailable("GEMINI_CALL_FAILED") from exc
 
             if data is None:
                 raise LocalModelUnavailable(last_err or "GEMINI_CALL_FAILED")
@@ -234,6 +235,10 @@ class GeminiModel:
                 raise LocalModelUnavailable("GEMINI_NO_CANDIDATE")
 
             candidate = candidates[0]
+            finish_reason = candidate.get("finishReason")
+            if finish_reason and finish_reason != "STOP":
+                return {"type": "answer", "answer": "The model did not finish its response.",
+                        "usage": total_usage, "stop_reason": finish_reason.lower()}
             parts = candidate.get("content", {}).get("parts", [])
 
             function_calls = [p["functionCall"] for p in parts if "functionCall" in p]

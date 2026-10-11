@@ -8,6 +8,14 @@ from api.assistant import GeminiModel, LocalModelUnavailable
 from api.assistant_tools import supported_answer
 
 
+@pytest.fixture(autouse=True)
+def isolated_gemini_environment(monkeypatch):
+    import api.assistant as assistant_mod
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    monkeypatch.setattr(assistant_mod, "_DISCOVERED_MODEL", "gemini-2.0-flash")
+
+
 class MockResponse:
     def __init__(self, data):
         self.raw = json.dumps(data).encode("utf-8")
@@ -44,6 +52,8 @@ def test_gemini_model_status():
     assert status["available"] is True
     assert status["state"] == "ready"
     assert status["model"]["provider"] == "gemini"
+    assert status["evaluation"]["actual_inference_gate"] == "not_evaluated"
+    assert status["evaluation"]["full_40_task_gate"] is False
 
 
 def test_gemini_model_infer_single_tool_and_answer(monkeypatch):
@@ -140,7 +150,8 @@ def test_gemini_model_discovery(monkeypatch):
     monkeypatch.setattr(assistant_mod, "_DISCOVERED_MODEL", None)
 
     def mock_urlopen(req, timeout=10):
-        assert "models?key=test-api-key" in req.full_url
+        assert req.full_url.endswith("/models")
+        assert req.get_header("X-goog-api-key") == "test-api-key"
         return MockResponse({
             "models": [
                 {
@@ -192,4 +203,33 @@ def test_gemini_model_infer_404_candidate_fallback(monkeypatch):
     assert "non-existent-model" in attempts[0]
     assert "gemini-2.0-flash" in attempts[1]
     assert model.model_id == "gemini-2.0-flash"
+
+
+def test_gemini_truncated_response_is_not_complete(monkeypatch):
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *args, **kwargs: MockResponse({
+        "candidates": [{"finishReason": "MAX_TOKENS", "content": {"parts": [{"text": "Partial"}]}}]
+    }))
+    result = GeminiModel(api_key="test-api-key").infer("Inspect study", [], DummyTools())
+    assert result["stop_reason"] == "max_tokens"
+
+
+def test_gemini_credentials_stay_out_of_url_and_errors(monkeypatch):
+    def fail(req, **kwargs):
+        assert "test-api-key" not in req.full_url
+        assert req.get_header("X-goog-api-key") == "test-api-key"
+        raise OSError("sensitive test-api-key network detail")
+    monkeypatch.setattr(urllib.request, "urlopen", fail)
+    with pytest.raises(LocalModelUnavailable) as error:
+        GeminiModel(api_key="test-api-key").infer("Inspect study", [], DummyTools())
+    assert str(error.value) == "GEMINI_CALL_FAILED"
+
+
+def test_gemini_http_error_body_not_exposed(monkeypatch):
+    def fail(req, **kwargs):
+        raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {},
+                                     io.BytesIO(b'{"error":"sensitive provider detail"}'))
+    monkeypatch.setattr(urllib.request, "urlopen", fail)
+    with pytest.raises(LocalModelUnavailable) as error:
+        GeminiModel(api_key="test-api-key").infer("Inspect study", [], DummyTools())
+    assert str(error.value) == "GEMINI_HTTP_403"
 

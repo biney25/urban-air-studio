@@ -9,6 +9,7 @@ import json
 import math
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 from api.storage import Store, canonical, digest
 
@@ -119,9 +120,11 @@ class PostgresStore(Store):
         if os.getenv("UA_DB_SSLROOTCERT"):
             options["sslrootcert"] = os.environ["UA_DB_SSLROOTCERT"]
             options["sslmode"] = "verify-full"
-        elif "sslmode=" not in self.database_url:
-            is_local = "127.0.0.1" in self.database_url or "localhost" in self.database_url
-            if not is_local:
+        else:
+            parsed = urlsplit(self.database_url)
+            is_local = parsed.hostname in {"127.0.0.1", "localhost", "::1"}
+            configured_ssl = parse_qs(parsed.query).get("sslmode", [None])[0]
+            if not is_local and configured_ssl not in {"require", "verify-ca", "verify-full"}:
                 options["sslmode"] = "require"
         connection = psycopg.connect(self.database_url, **options)
         connection.execute("SELECT set_config('search_path', 'urban, public', false)")

@@ -1,5 +1,7 @@
 # Urban Air Studio
 
+**Live demo:** [urban-air-studio.onrender.com](https://urban-air-studio.onrender.com) runs the real API/T1 worker and Cedar authorization on Render Free. Native CFD execution remains local; pure-Python case preparation/download is enabled. Optional Google Gemini REST inference is separate from local Strands/Ollama. Persistence of database metadata, session access and simulation files must each be verified. See [deployment comparison](docs/deployed-vs-local.md). This is a research demo, not qualified citywide pollution prediction or production hosting.
+
 A map-first environmental workbench: choose a place, review building inputs,
 preserve a baseline, edit an alternative and compare traceable **research-preview**
 results in a readable report. Upload is an additional route for permitted plans.
@@ -152,8 +154,9 @@ confirmed as a GitHub account; event usernames are not treated as GitHub handles
 Each person's actual deliverables still need their confirmation in the submission.
 
 OpenAI Codex/ChatGPT coding assistance and focused frontend/platform/science
-subagents were used for implementation, research and testing. Antigravity was
-prepared as a handoff but **not used to build the product**, per the owner.
+subagents were used for implementation, research and testing. Google Gemini /
+Antigravity assisted with later hosting, database and optional cloud-assistant
+changes; those changes were subsequently audited and corrected with Codex.
 
 Framework/dependency credits include Cedar/cedarpy, Strands, Ollama/Qwen3,
 OpenFOAM Foundation/CFD Direct, MapLibre, Poppins/Inter, React, Vite, Cesium,

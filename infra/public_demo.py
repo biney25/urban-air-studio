@@ -109,6 +109,18 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
         try:
             from api.postgres import PostgresStore
             class DemoPostgresStore(PostgresStore):
+                def migrate(self):
+                    # Reject shared private state before migration or the unscoped
+                    # background worker can touch the ordinary application's DB.
+                    with closing(self.connect()) as db:
+                        for table in ("objects", "runs"):
+                            exists = db.execute("SELECT to_regclass(?)", (f"urban.{table}",)).fetchone()[0]
+                            if exists and db.execute(
+                                f"SELECT 1 FROM urban.{table} WHERE tenant_id NOT LIKE 'demo:%' LIMIT 1"
+                            ).fetchone():
+                                raise ValueError("DEMO_DATABASE_NOT_ISOLATED")
+                    return super().migrate()
+
                 def atomic_artifact(self, run_id, fence, payload):
                     encoded = canonical(payload).encode("utf-8")
                     if len(encoded) > limits.artifact_bytes or size(directory) + len(encoded) > limits.storage_bytes:
@@ -116,8 +128,10 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
                     return super().atomic_artifact(run_id, fence, payload)
             store = DemoPostgresStore(directory, database_url=database_url, auto_migrate=True)
         except Exception as exc:
-            storage_error = str(exc)
-            logging.getLogger(__name__).warning("DemoPostgresStore fallback: %s", exc)
+            # Driver error text may contain connection credentials or private
+            # server details. Only a fixed code and exception class leave here.
+            storage_error = "DEMO_DATABASE_UNAVAILABLE"
+            logging.getLogger(__name__).warning("Demo database unavailable; isolated SQLite fallback (%s)", type(exc).__name__)
             store = DemoStore(directory)
     else:
         store = DemoStore(directory)
@@ -166,12 +180,13 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
     secret_file = directory / ".demo-secret"
     secret_env = os.getenv("UA_DEMO_SECRET") or os.getenv("SECRET_KEY")
     if secret_env:
+        if len(secret_env.encode("utf-8")) < 32:
+            raise ValueError("Demo cookie signing secret must contain at least 32 bytes")
         secret = hashlib.sha256(secret_env.encode("utf-8")).digest()
     elif secret_file.exists():
-        try:
-            secret = secret_file.read_bytes()
-        except OSError:
-            secret = secrets.token_bytes(32)
+        secret = secret_file.read_bytes()
+        if len(secret) != 32:
+            raise ValueError("Persisted demo cookie signing secret is invalid")
     else:
         secret = secrets.token_bytes(32)
         try:
@@ -199,6 +214,8 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
             if not hmac.compare_digest(token, signed(sid, expires)) or int(expires) <= now:
                 return None, False, problem("DEMO_SESSION_INVALID", "Demo session expired; clear the cookie and reopen the demo", 401)
             if sid not in sessions:
+                if len(sessions) >= limits.sessions:
+                    return None, False, problem("DEMO_SESSION_CAP", "The public demo session allowance is full; try after the next reset")
                 sessions[sid] = {"expires": int(expires), "requests": deque(), "writes": deque()}
             return sid, False, None
         if len(sessions) >= limits.sessions:
@@ -349,11 +366,18 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
         payload = {"phase": "Isolated public research demo", "model_version": MODEL_VERSION,
             "supported_tiers": ["T0", "T1"], "capability_statuses": {"T0": "implemented_geometry_diagnostics", "T1": "research_preview_unvalidated", "T2": "not_hosted_on_free_demo"},
             "species": ["passive_tracer"], "imports": ["GeoJSON Polygon/Point"], "identity": "anonymous_browser_session",
-            "storage": storage_kind, "operator_views_available": False, "ai_available": gemini_ready,
+            "storage": storage_kind, "storage_persistent": storage_kind.startswith("postgres-"),
+            "session_access_persistent": bool(secret_env),
+            "artifacts_persistent": bool(store.artifacts),
+            "operator_views_available": False, "ai_available": gemini_ready,
             "study_assistant": {"state": "ready" if gemini_ready else "unavailable", "scope": "reviewed study tools via Gemini" if gemini_ready else "not hosted on free demo", "qualified": False},
             "cloud_deployed": False, "validated": False,
             "geographic_context": {"map_navigation": "Supported worldwide coordinates", "providers": ["OSM geometry", "Open-Meteo GFS weather context"], "semantic_preparation": "review_required", "national_scientific_coverage": False},
-            "limitations": ["Ephemeral anonymous demo; no accounts or production cloud assurance", "T1 research previews are scientifically unvalidated", "Native CFD is not hosted; case download available"]}
+            "limitations": ["Anonymous demo; no verified accounts or production cloud assurance",
+                "T1 research previews are scientifically unvalidated",
+                "Native CFD is not hosted; case download available",
+                "Database metadata, browser session access and simulation files have separate persistence requirements",
+                "Cloud assistant configuration is not proof of a successful inference or completed evaluation"]}
         if getattr(app.state, "storage_error", None):
             payload["storage_error"] = app.state.storage_error
         return payload

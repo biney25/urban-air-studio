@@ -4,7 +4,7 @@ export interface AssistantStatus {
   available: boolean;
   state: "ready" | "unavailable" | "busy";
   message: string;
-  model: { provider: "ollama"; model_id: string };
+  model: { provider: "ollama" | "gemini"; model_id: string };
   limits: Record<string, unknown>;
   reason_code?: string | null;
 }
@@ -40,7 +40,7 @@ export interface AssistantReply {
   }[];
   proposal: AssistantProposal | null;
   limitations: string[];
-  model: { provider: "ollama"; model_id: string };
+  model: { provider: "ollama" | "gemini"; model_id: string };
   elapsed_seconds: number;
   content_hash: string;
 }
