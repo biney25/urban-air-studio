@@ -519,6 +519,7 @@ export function caseConfig(
 export function controlledDownloadPath(path: string): boolean {
   if (path !== path.trim() || /[\r\n]/.test(path)) return false;
   return (
+    /^\/(?:scenarios|runs)\/[A-Za-z0-9_-]+\/export$/.test(path) ||
     /^\/reports\/[A-Za-z0-9_-]+\/download\?format=(?:html|pdf|json)$/.test(
       path,
     ) ||

@@ -32,9 +32,16 @@ import {
   Upload,
   Wind,
 } from "lucide-react";
-import { api, downloadJson, downloadProtected, resultApi } from "./api";
+import { api, downloadProtected, resultApi } from "./api";
 import { AuthStatus } from "./components/AuthGate";
 import { comparisonMatchesSelection, matchedSliceIssue } from "./comparison";
+import { comparisonOverview } from "./comparisonOverview";
+import { scenarioChanges } from "./scenarioChanges";
+import {
+  frozenReportSelection,
+  workflowPath,
+  workflowSearch,
+} from "./workflowContext";
 import { gatedViews, projectView } from "./viewState";
 import type {
   Comparison,
@@ -73,6 +80,14 @@ import {
 } from "./components/UI";
 import ObjectInspector from "./components/ObjectInspector";
 import EvidenceWorkspace from "./components/EvidenceWorkspace";
+import ExploreHandoff from "./components/ExploreHandoff";
+import AssistantWorkspace from "./components/AssistantWorkspace";
+import ResponseStudyPanel from "./components/ResponseStudyPanel";
+import ReviewPanel from "./components/ReviewPanel";
+import { TaskTrail } from "./components/WorkspaceNav";
+import PlanningBriefPanel from "./components/PlanningBriefPanel";
+import TrafficAllocationPanel from "./components/TrafficAllocationPanel";
+import type { Readiness } from "./evidence";
 const DEFAULT_CONDITIONS: Conditions = {
   wind_speed_m_s: 3,
   wind_from_deg: 270,
@@ -80,11 +95,22 @@ const DEFAULT_CONDITIONS: Conditions = {
   background_ug_m3: 0,
   duration_s: 120,
 };
+const runStatusLabel = (status: Run["status"]) =>
+  status === "complete_unqualified"
+    ? "Finished · research preview"
+    : {
+        queued: "Queued",
+        preparing: "Preparing inputs",
+        solving: "Running study",
+        verifying: "Checking results",
+        failed: "Failed · review details",
+        cancelled: "Cancelled",
+      }[status];
 const laterCapabilities = [
   [
-    "AI planner",
+    "Wider assistant tasks",
     "Stage C",
-    "Bounded Strands tools and evidence evaluation are required.",
+    "Additional adversarial and representative-user evaluations are required beyond the current scoped study assistant.",
   ],
   [
     "Optimisation",
@@ -130,10 +156,29 @@ export default function Studio() {
     refetchInterval: (q) =>
       q.state.data?.runs.some((r) => isActive(r.status)) ? 1000 : false,
   });
+  const reportId =
+    rawView === "reports"
+      ? (sub[1] ?? params.get("report") ?? "")
+      : (params.get("report") ?? "");
+  const reportQuery = useQuery({
+    queryKey: ["report", reportId],
+    queryFn: ({ signal }) =>
+      api<Report>(`/reports/${reportId}`, undefined, signal),
+    enabled: !!reportId,
+  });
+  const activeReport =
+    view === "reports" && reportQuery.data?.project_id === projectId
+      ? reportQuery.data
+      : undefined;
+  const frozenSelection = activeReport
+    ? frozenReportSelection(activeReport, detail.data?.runs ?? [])
+    : undefined;
   const fallbackScenario =
     detail.data?.project.baseline_scenario_id ??
     detail.data?.scenarios.at(-1)?.id;
   const scenarioId =
+    frozenSelection?.scenarioId ??
+    (view === "reports" && reportId && !reportQuery.data ? "" : undefined) ??
     (rawView === "scenarios" ? sub[1] : params.get("scenario")) ??
     fallbackScenario ??
     "";
@@ -171,10 +216,12 @@ export default function Studio() {
     detail.data?.scenarios.find((s) => s.id === runQuery.data?.scenario_id) ??
     scenario;
   const baseRunId =
+    frozenSelection?.baselineRunId ??
     params.get("base") ??
     [...completed].reverse().find((r) => r.scenario_id === baseline?.id)?.id ??
     "";
   const alternativeRunId =
+    frozenSelection?.alternativeRunId ??
     params.get("alt") ??
     [...completed].reverse().find((r) => r.scenario_id !== baseline?.id)?.id ??
     baseRunId;
@@ -218,24 +265,51 @@ export default function Studio() {
     setSelected(null);
     setActionError(null);
   }, [projectId]);
-  const reportId =
-    rawView === "reports"
-      ? (sub[1] ?? params.get("report") ?? "")
-      : (params.get("report") ?? "");
-  const reportQuery = useQuery({
-    queryKey: ["report", reportId],
+  const reports = useQuery({
+    queryKey: ["reports", projectId],
     queryFn: ({ signal }) =>
-      api<Report>(`/reports/${reportId}`, undefined, signal),
-    enabled: !!reportId,
+      api<Report[]>(
+        `/projects/${encodeURIComponent(projectId)}/reports`,
+        undefined,
+        signal,
+      ),
+    enabled: view === "reports",
+    retry: false,
+  });
+  const sourceInventory = useQuery({
+    queryKey: ["qualification", projectId],
+    queryFn: ({ signal }) =>
+      api<Readiness>(
+        `/projects/${encodeURIComponent(projectId)}/qualification`,
+        undefined,
+        signal,
+      ),
+    enabled: view === "sources",
+    retry: false,
+  });
+  const exportEvidence = async (resource: "scenarios" | "runs", id: string) => {
+    try {
+      await downloadProtected(
+        `/${resource}/${encodeURIComponent(id)}/export`,
+        `${resource}-${id}-research.json`,
+      );
+    } catch (error) {
+      setActionError(error);
+    }
+  };
+  const navigationParams = workflowSearch(params, {
+    scenario: scenarioId || undefined,
+    base: baseRunId || undefined,
+    alt: alternativeRunId || undefined,
+    ...(activeReport ? { report: activeReport.id } : {}),
   });
   const path = (next: string, sid?: string) =>
-    `/projects/${projectId}/${next}${next.includes("?") ? "" : sid ? `?scenario=${sid}` : scenarioId ? `?scenario=${scenarioId}` : ""}`;
+    workflowPath(projectId, next, navigationParams, { scenario: sid });
   const chooseScenario = (id: string) => {
     const next = new URLSearchParams(params);
     next.set("scenario", id);
     setParams(next);
-    if (rawView === "scenarios")
-      navigate(`/projects/${projectId}/scenarios/${id}`);
+    if (rawView === "scenarios") navigate(path(`scenarios/${id}`, id));
     setActionError(null);
   };
   const go = (next: string) => navigate(path(next));
@@ -243,7 +317,7 @@ export default function Studio() {
     client.setQueryData(["scenario", s.id], s);
     await client.invalidateQueries({ queryKey: ["project", projectId] });
     setRedo([]);
-    navigate(`/projects/${projectId}/scenarios/${s.id}`);
+    navigate(path(`scenarios/${s.id}`, s.id));
     setActionError(null);
     setQuote(null);
   };
@@ -323,8 +397,15 @@ export default function Studio() {
     },
     onSuccess: (r) => {
       client.setQueryData(["report", r.id], r);
+      void client.invalidateQueries({ queryKey: ["reports", projectId] });
       if (r.project_id === projectId)
-        navigate(`/projects/${projectId}/reports/${r.id}`);
+        navigate(
+          workflowPath(projectId, `reports/${r.id}`, navigationParams, {
+            report: r.id,
+            base: r.baseline_run_id,
+            alt: r.alternative_run_id,
+          }),
+        );
     },
     onError: setActionError,
   });
@@ -366,7 +447,13 @@ export default function Studio() {
     );
   const project = detail.data.project;
   const isBaseline = scenarioId === project.baseline_scenario_id;
-  const executedContextScenario = detail.data.scenarios.find(s => s.id === runQuery.data?.scenario_id);
+  const sourceContextId = (
+    scenario as
+      (Scenario & { source_preparation?: { context_id?: string } }) | undefined
+  )?.source_preparation?.context_id;
+  const executedContextScenario = detail.data.scenarios.find(
+    (s) => s.id === runQuery.data?.scenario_id,
+  );
   const busy = operation.isPending || branch.isPending;
   const area =
     scenario?.buildings.reduce((sum, b) => sum + polygonArea(b.footprint), 0) ??
@@ -414,18 +501,25 @@ export default function Studio() {
               ["exports", "Export"],
               ["evidence", "Evidence"],
             ]
-          : [["investigate", "Capability roadmap"]];
+          : [
+              ["investigate", "Study assistant"],
+              ["optimisations", "Research capabilities"],
+            ];
   return (
     <div
-      className={`studio-app ${scenario && (["explore", "design", "sources", "receptors"].includes(view) || (view === "result" && resultQuery.data)) ? "spatial-workspace" : ""}`}
+      className={`studio-app ${scenario && (["explore", "design", "sources", "receptors"].includes(view) || (view === "result" && resultQuery.data)) ? "spatial-workspace" : ""} ${scenario && ["explore", "design", "sources", "receptors"].includes(view) ? "geometry-workspace" : ""}`}
     >
       <header className="studio-header">
-        <Link className="brand compact" to="/projects" aria-label="Urban Air Studio projects">
+        <Link
+          className="brand compact"
+          to="/projects"
+          aria-label="Urban Air Studio projects"
+        >
           <span className="brand-mark">
             <Wind size={20} />
           </span>
           <span>
-            URBAN AIR{" "}<span>STUDIO</span>
+            URBAN AIR <span>STUDIO</span>
           </span>
         </Link>
         <span className="header-separator" />
@@ -435,10 +529,22 @@ export default function Studio() {
           <ChevronDown size={13} />
         </Link>
         <div className="header-context">
-          <span>Passive tracer</span>
-          <span>µg/m³</span>
-          <Badge tone="amber">T1 · research preview</Badge>
-          <AuthStatus />
+          {["result", "compare", "reports"].includes(view) ? (
+            <>
+              <span>Passive tracer · µg/m³</span>
+              <Badge tone="amber">Research preview</Badge>
+            </>
+          ) : (
+            <Badge tone="cyan">
+              {project.baseline_scenario_id
+                ? "Baseline fixed"
+                : "Inputs to review"}
+            </Badge>
+          )}
+          <details className="session-disclosure">
+            <summary>Session</summary>
+            <AuthStatus />
+          </details>
         </div>
       </header>
       <aside className="workspace-rail" aria-label="Workspace navigation">
@@ -459,19 +565,33 @@ export default function Studio() {
             id: "compare",
             icon: BarChart3,
             label: "Compare",
-            group: ["study", "runs", "result", "compare", "reports", "exports", "evidence"],
+            group: [
+              "study",
+              "runs",
+              "result",
+              "compare",
+              "reports",
+              "exports",
+              "evidence",
+            ],
           },
           {
             id: "investigate",
             icon: FlaskConical,
             label: "Investigate",
-            group: ["investigate"],
+            group: ["investigate", "assistant"],
           },
         ].map((n) => (
           <button
             key={n.id}
             className={n.group.includes(view) ? "active" : ""}
-            onClick={() => go(n.id)}
+            onClick={() =>
+              n.id === "explore"
+                ? navigate(
+                    `/explore?${workflowSearch(navigationParams, { project: projectId, ...(sourceContextId ? { context: sourceContextId, lat: null, lng: null, width: null } : project.site ? { lat: String(project.site.latitude), lng: String(project.site.longitude), width: String(project.site.width_km) } : {}) })}`,
+                  )
+                : go(n.id)
+            }
             title={n.label}
             aria-label={`${n.label} workspace`}
             aria-current={n.group.includes(view) ? "page" : undefined}
@@ -483,10 +603,20 @@ export default function Studio() {
         <Link to="/projects" title="Projects" aria-label="Projects">
           <FolderOpen size={20} />
         </Link>
-        <span className="rail-version">A / 01</span>
       </aside>
       <div className="studio-body">
-        <div className="compact-review-note">Compact review layout · expand the window for a larger modelling canvas.</div>
+        <div className="compact-review-note">
+          Compact review layout · expand the window for a larger modelling
+          canvas.
+        </div>
+        <TaskTrail
+          projectId={projectId}
+          active={view}
+          scenarioId={scenarioId}
+          site={project.site}
+          contextId={sourceContextId}
+          searchParams={navigationParams}
+        />
         <nav className="task-nav" aria-label="Task views">
           {tabList.map(([id, label]) => (
             <button
@@ -499,13 +629,26 @@ export default function Studio() {
             </button>
           ))}
           <span className="task-nav-tail" data-testid="snapshot-context">
-            {view === "result" ? (
-              runQuery.data ? <>
-                <span className="violet-dot" />
-                Executed result · {runQuery.data.scenario_id === project.baseline_scenario_id ? "Baseline" : "Alternative"}
-                {executedContextScenario ? ` · v${executedContextScenario.version}` : ""}
-                {` · ${shortId(runQuery.data.scenario_id)}`}
-              </> : <>Executed result · {runQuery.error ? "snapshot unavailable" : "loading snapshot"}</>
+            {activeReport ? (
+              <>Frozen report · exact baseline / alternative pair</>
+            ) : view === "result" ? (
+              runQuery.data ? (
+                <>
+                  <span className="violet-dot" />
+                  Executed result ·{" "}
+                  {runQuery.data.scenario_id === project.baseline_scenario_id
+                    ? "Baseline"
+                    : "Alternative"}
+                  {executedContextScenario
+                    ? ` · v${executedContextScenario.version}`
+                    : ""}
+                </>
+              ) : (
+                <>
+                  Executed result ·{" "}
+                  {runQuery.error ? "snapshot unavailable" : "loading snapshot"}
+                </>
+              )
             ) : scenario ? (
               <>
                 <span className="violet-dot" />
@@ -518,10 +661,19 @@ export default function Studio() {
         </nav>
         <main id="main-content" className="workspace-main">
           {actionError ? <ErrorBox error={actionError} /> : null}
-          {view === "evidence" ? <EvidenceWorkspace key={projectId} projectId={projectId} scenario={scenario} scenarios={detail.data.scenarios} onScenario={id => navigate(path("evidence", id))} /> : null}
+          {view === "evidence" ? (
+            <EvidenceWorkspace
+              key={projectId}
+              projectId={projectId}
+              scenario={scenario}
+              scenarios={detail.data.scenarios}
+              onScenario={(id) => navigate(path("evidence", id))}
+            />
+          ) : null}
           {view === "imports" ? (
             <ImportView
               projectId={projectId}
+              exploreContextId={params.get("explore_context") ?? ""}
               imports={detail.data.imports}
               onImported={async (s) => {
                 client.setQueryData(["scenario", s.id], s);
@@ -681,7 +833,7 @@ export default function Studio() {
                     onSelect={selectObject}
                     scaleMax={1}
                   />
-                  <aside className="inspector">
+                  <aside className="inspector" key={scenario.id}>
                     <div className="inspector-top">
                       <span className="eyebrow">
                         {view === "sources"
@@ -716,7 +868,7 @@ export default function Studio() {
                         <div className="coverage-item">
                           <span className="mask-dot" />
                           <strong>Site validation</strong>
-                          <Badge>Stage B</Badge>
+                          <Badge tone="amber">Unvalidated</Badge>
                         </div>
                         <button className="button" onClick={() => go("data")}>
                           Inspect data audit
@@ -726,29 +878,43 @@ export default function Studio() {
                     ) : (
                       <>
                         <div className="branch-form">
-                          <label className="form-label">
-                            Alternative name
-                            <input
-                              data-testid="branch-name"
-                              value={branchName}
-                              onChange={(e) => setBranchName(e.target.value)}
-                              maxLength={100}
-                            />
-                          </label>
-                          <button
-                            data-testid="clone-scenario"
-                            className="button"
-                            disabled={busy || !branchName.trim()}
-                            onClick={() => branch.mutate()}
+                          <PlanningBriefPanel
+                            project={project}
+                            scenario={scenario}
+                          />
+                          <details
+                            className="alternative-tools"
+                            open={isBaseline}
                           >
-                            <GitBranch size={15} />
-                            Clone this version
-                          </button>
+                            <summary>
+                              {isBaseline
+                                ? "Create your first alternative"
+                                : "Create another alternative"}
+                            </summary>
+                            <label className="form-label">
+                              Alternative name
+                              <input
+                                data-testid="branch-name"
+                                value={branchName}
+                                onChange={(e) => setBranchName(e.target.value)}
+                                maxLength={100}
+                              />
+                            </label>
+                            <button
+                              data-testid="clone-scenario"
+                              className="button"
+                              disabled={busy || !branchName.trim()}
+                              onClick={() => branch.mutate()}
+                            >
+                              <GitBranch size={15} />
+                              Create alternative
+                            </button>
+                          </details>
                         </div>
                         {isBaseline ? (
                           <p className="inspector-message">
                             <LockKeyhole size={15} />
-                            The baseline is frozen. Clone an alternative to
+                            The baseline is fixed. Create an alternative to
                             edit.
                           </p>
                         ) : null}
@@ -773,6 +939,35 @@ export default function Studio() {
                             : undefined
                       }
                     />
+                    {view === "sources" ? (
+                      <details className="source-tools inspector-section">
+                        <summary>
+                          Traffic inventory and source allocation
+                        </summary>
+                        <p>
+                          Road geometry alone does not supply traffic counts or
+                          emissions. Review the inventory's factor basis and
+                          units before allocating sources.
+                        </p>
+                        <Link className="text-button" to={path("evidence")}>
+                          Add or review traffic inventory evidence
+                          <ArrowRight size={14} />
+                        </Link>
+                        {sourceInventory.isPending ? (
+                          <Loading label="Opening source evidence…" />
+                        ) : sourceInventory.error ? (
+                          <ErrorBox error={sourceInventory.error} />
+                        ) : (
+                          <TrafficAllocationPanel
+                            projectId={projectId}
+                            records={sourceInventory.data?.evidence ?? []}
+                            scenario={scenario}
+                            scenarios={detail.data.scenarios}
+                            onScenario={(id) => navigate(path("sources", id))}
+                          />
+                        )}
+                      </details>
+                    ) : null}
                   </aside>
                 </div>
                 <div className="bottom-dock">
@@ -876,6 +1071,7 @@ export default function Studio() {
                 title="Study setup"
                 description="One shared set of conditions for the baseline and selected alternative. Only the bounded T1 passive-tracer method is available."
               />
+              <PlanningBriefPanel project={project} scenario={scenario} />
               {baseline && scenario ? (
                 <div className="study-layout">
                   <form
@@ -1104,12 +1300,15 @@ export default function Studio() {
                                   : "quiet"
                             }
                           >
-                            {r.status.replaceAll("_", " ")}
+                            {runStatusLabel(r.status)}
                           </Badge>
                         </h3>
-                        <span>
-                          {r.stage} · attempt {r.attempt} · {shortId(r.id)}
-                        </span>
+                        <details className="run-identity">
+                          <summary>Run evidence</summary>
+                          <span>
+                            {r.stage} · attempt {r.attempt} · {shortId(r.id)}
+                          </span>
+                        </details>
                         {isActive(r.status) ? (
                           <div
                             className="progress-track"
@@ -1169,12 +1368,7 @@ export default function Studio() {
                           aria-label={`Download manifest ${shortId(r.id)}`}
                           title="Download exact manifest"
                           className="icon-button"
-                          onClick={() =>
-                            downloadJson(
-                              `run-${r.id}-manifest.json`,
-                              r.manifest,
-                            )
-                          }
+                          onClick={() => void exportEvidence("runs", r.id)}
                         >
                           <Download size={16} />
                         </button>
@@ -1292,22 +1486,17 @@ export default function Studio() {
                         </button>
                         <button
                           className="button"
-                          onClick={() =>
-                            downloadJson(
-                              `run-${runId}-manifest.json`,
-                              runQuery.data?.manifest,
-                            )
-                          }
+                          onClick={() => void exportEvidence("runs", runId)}
                         >
                           <Download size={15} />
-                          Exact run manifest
+                          Permitted run evidence
                         </button>
                       </aside>
                     </div>
                   </>
                 ) : (
                   <Empty
-                    title={`Run ${runQuery.data.status.replaceAll("_", " ")}`}
+                    title={runStatusLabel(runQuery.data.status)}
                     action={
                       <button className="button" onClick={() => go("runs")}>
                         Open run centre
@@ -1416,6 +1605,41 @@ export default function Studio() {
                         : "Matched-condition comparison"}
                     </span>
                   </div>
+                  <ComparisonOutcome data={comparisonData} />
+                  <SelectedPairSummary
+                    baseline={detail.data.scenarios.find(
+                      (item) =>
+                        item.id ===
+                        detail.data.runs.find((run) => run.id === baseRunId)
+                          ?.scenario_id,
+                    )}
+                    alternative={detail.data.scenarios.find(
+                      (item) =>
+                        item.id ===
+                        detail.data.runs.find(
+                          (run) => run.id === alternativeRunId,
+                        )?.scenario_id,
+                    )}
+                    baselineRunId={baseRunId}
+                    alternativeRunId={alternativeRunId}
+                  />
+                  <ResponseStudyPanel
+                    project={project}
+                    scenario={scenario}
+                    runs={detail.data.runs}
+                    onOpenScenario={(id) => navigate(path("design", id))}
+                    onComparePair={(base, alt) =>
+                      navigate(
+                        workflowPath(projectId, "compare", navigationParams, {
+                          base,
+                          alt,
+                          scenario: detail.data.runs.find(
+                            (run) => run.id === alt,
+                          )?.scenario_id,
+                        }),
+                      )
+                    }
+                  />
                   <MatchedFields
                     baselineResult={baseField.data}
                     alternativeResult={alternativeField.data}
@@ -1493,16 +1717,80 @@ export default function Studio() {
               <SectionHeading
                 eyebrow="IMMUTABLE DECISION RECORD"
                 title="Reports"
-                description="Drafts reference exact evidence. Scientific and professional approval are not available in the local Phase A workspace."
+                description="Reopen a decision record or create one from a matched comparison. Drafts retain the exact evidence and research limitations."
               />
+              {reportId ? (
+                <Link
+                  className="text-button"
+                  to={workflowPath(projectId, "reports", navigationParams, {
+                    report: null,
+                  })}
+                >
+                  All reports
+                </Link>
+              ) : null}
               {reportId ? (
                 reportQuery.isPending ? (
                   <Loading label="Loading report draft…" />
                 ) : reportQuery.error ? (
                   <ErrorBox error={reportQuery.error} />
+                ) : reportQuery.data?.project_id !== projectId ? (
+                  <ErrorBox
+                    error={
+                      new Error(
+                        "This report belongs to another project. Open it from that project's report library.",
+                      )
+                    }
+                  />
                 ) : reportQuery.data ? (
-                  <ReportView report={reportQuery.data} />
+                  <>
+                    <ReportView report={reportQuery.data} />
+                    <ReviewPanel report={reportQuery.data} />
+                  </>
                 ) : null
+              ) : reports.isPending ? (
+                <Loading label="Opening saved reports…" />
+              ) : reports.error ? (
+                <ErrorBox
+                  error={reports.error}
+                  onRetry={() => void reports.refetch()}
+                />
+              ) : reports.data?.length ? (
+                <div className="report-library">
+                  {[...reports.data].reverse().map((report) => (
+                    <Link
+                      key={report.id}
+                      className="report-library-item"
+                      to={workflowPath(
+                        projectId,
+                        `reports/${report.id}`,
+                        navigationParams,
+                        {
+                          report: report.id,
+                          base: report.baseline_run_id,
+                          alt: report.alternative_run_id,
+                        },
+                      )}
+                    >
+                      <FileText size={24} />
+                      <div>
+                        <h2>{report.title}</h2>
+                        <p>
+                          {new Date(report.created_at).toLocaleDateString(
+                            "en-IN",
+                          )}{" "}
+                          · Exact baseline / alternative pair
+                        </p>
+                        <Badge tone="amber">Draft · research preview</Badge>
+                      </div>
+                      <ArrowRight size={18} />
+                    </Link>
+                  ))}
+                  <button className="button" onClick={() => go("compare")}>
+                    Create another comparison report
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
               ) : (
                 <Empty
                   title="Create a report from a comparison"
@@ -1527,7 +1815,7 @@ export default function Studio() {
               <SectionHeading
                 eyebrow="PERMITTED RESEARCH EVIDENCE"
                 title="Export & reproduce"
-                description="Download exact scenario inputs and run manifests. Native solver packages and fully reproducible cross-platform runners have later release gates."
+                description="Download the server-reviewed research package with its required attribution, source compliance and limitations. Restricted inputs remain excluded or block the export."
               />
               {scenario ? (
                 <>
@@ -1545,11 +1833,11 @@ export default function Studio() {
                     <button
                       className="button"
                       onClick={() =>
-                        downloadJson(`scenario-${scenario.id}.json`, scenario)
+                        void exportEvidence("scenarios", scenario.id)
                       }
                     >
                       <Download size={15} />
-                      Scenario JSON
+                      Permitted scenario package
                     </button>
                   </div>
                   {detail.data.runs.map((r) => (
@@ -1558,36 +1846,17 @@ export default function Studio() {
                       <div>
                         <h3>Run {shortId(r.id)}</h3>
                         <p>
-                          {r.status.replaceAll("_", " ")} · exact conditions,
-                          method and input identity
+                          {runStatusLabel(r.status)} · exact conditions, method
+                          and input identity
                         </p>
                       </div>
                       <button
                         className="button"
-                        onClick={() =>
-                          downloadJson(`run-${r.id}-manifest.json`, r.manifest)
-                        }
+                        onClick={() => void exportEvidence("runs", r.id)}
                       >
                         <Download size={15} />
-                        Manifest
+                        Permitted run package
                       </button>
-                      {r.status === "complete_unqualified" ? (
-                        <button
-                          className="button"
-                          onClick={async () => {
-                            try {
-                              downloadJson(
-                                `run-${r.id}-result.json`,
-                                await resultApi(r.id),
-                              );
-                            } catch (e) {
-                              setActionError(e);
-                            }
-                          }}
-                        >
-                          Field & metrics JSON
-                        </button>
-                      ) : null}
                     </div>
                   ))}
                 </>
@@ -1599,30 +1868,69 @@ export default function Studio() {
               )}
             </div>
           ) : null}
-          {view === "investigate" || gatedViews.includes(view) ? (
+          {view === "investigate" || view === "assistant" ? (
+            <>
+              <AssistantWorkspace
+                key={projectId}
+                projectId={projectId}
+                scenario={scenario}
+                baselineId={project.baseline_scenario_id}
+                baselineRunId={baseRunId}
+                alternativeRunId={alternativeRunId}
+                planningQuestion={project.planning_question}
+                onChanged={async (updated) => {
+                  client.setQueryData(["scenario", updated.id], updated);
+                  await client.invalidateQueries({
+                    queryKey: ["project", projectId],
+                  });
+                  navigate(path("investigate", updated.id));
+                }}
+                onBranch={() => go("design")}
+              />
+              <div className="content-page response-study-anchor">
+                <ResponseStudyPanel
+                  project={project}
+                  scenario={scenario}
+                  runs={detail.data.runs}
+                  onOpenScenario={(id) => navigate(path("design", id))}
+                  onComparePair={(base, alt) =>
+                    navigate(
+                      workflowPath(projectId, "compare", navigationParams, {
+                        base,
+                        alt,
+                        scenario: detail.data.runs.find((run) => run.id === alt)
+                          ?.scenario_id,
+                      }),
+                    )
+                  }
+                />
+              </div>
+            </>
+          ) : null}
+          {gatedViews.includes(view) ? (
             <div className="content-page">
               <SectionHeading
-                eyebrow="THE FULL PRODUCT REMAINS THE REFERENCE"
-                title="Capability roadmap"
-                description="These capabilities have named scientific and operational gates. Phase A does not substitute invented outputs for them."
+                eyebrow="RESEARCH CAPABILITIES"
+                title="Capabilities that need more evidence"
+                description="Detailed modelling, optimisation and wider coverage require additional inputs, validation and operational review."
               />
               {gatedViews.includes(view) ? (
                 <div className="fallback-note" role="status">
                   The requested{" "}
                   {view === "optimisations" ? "optimisation" : view} capability
-                  is unavailable in this local Phase A workspace. Its release
-                  and evidence gates are listed below.
+                  is unavailable in this workspace. Its release and evidence
+                  gates are listed below.
                 </div>
               ) : null}
               <div className="capability-list">
-                {laterCapabilities.map(([name, stage, reason]) => (
+                {laterCapabilities.map(([name, , reason]) => (
                   <div key={name}>
                     <LockKeyhole size={21} />
                     <div>
                       <h3>{name}</h3>
                       <p>{reason}</p>
                     </div>
-                    <Badge>{stage} · unavailable</Badge>
+                    <Badge>Unavailable</Badge>
                   </div>
                 ))}
               </div>
@@ -1661,15 +1969,19 @@ export default function Studio() {
         <footer className="studio-footer">
           <span>
             <span className="status-dot" />
-            Loopback development workspace
+            Research workspace
           </span>
           <span data-testid="snapshot-footer">
             Project {shortId(projectId)} ·{" "}
             {view === "result"
-              ? runQuery.data ? `executed run ${shortId(runQuery.data.id)} · snapshot ${shortId(runQuery.data.scenario_id)}` : "executed snapshot unavailable"
-              : scenario ? `selected design snapshot ${shortId(scenario.id)}` : "no geometry"}
+              ? runQuery.data
+                ? `executed run ${shortId(runQuery.data.id)} · snapshot ${shortId(runQuery.data.scenario_id)}`
+                : "executed snapshot unavailable"
+              : scenario
+                ? `selected design snapshot ${shortId(scenario.id)}`
+                : "no geometry"}
           </span>
-          <span>No provider imagery · no observed AQI</span>
+          <span>Scientific validation incomplete</span>
         </footer>
       </div>
     </div>
@@ -1831,10 +2143,12 @@ function ObjectList({
 }
 function ImportView({
   projectId,
+  exploreContextId,
   imports,
   onImported,
 }: {
   projectId: string;
+  exploreContextId: string;
   imports: ImportRecord[];
   onImported: (s: Scenario) => void | Promise<void>;
 }) {
@@ -1877,6 +2191,20 @@ function ImportView({
         title="Bring your site into focus"
         description="Import independent WGS84 GeoJSON for a bounded area. Buildings, point sources and receptors are audited before they become a baseline."
       />
+      {exploreContextId ? (
+        <ExploreHandoff
+          key={exploreContextId}
+          contextId={exploreContextId}
+          projectId={projectId}
+        />
+      ) : (
+        <Link
+          className="button"
+          to={`/explore?project=${encodeURIComponent(projectId)}`}
+        >
+          <MapPin size={16} /> Explore geographic context for this project
+        </Link>
+      )}
       <div className="import-layout">
         <form
           className="import-form"
@@ -1999,7 +2327,12 @@ function ImportView({
       {imports.length ? (
         <section className="past-imports">
           <h2>Import history</h2>
-          <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable import diagnostics">
+          <div
+            className="table-wrap"
+            tabIndex={0}
+            role="region"
+            aria-label="Scrollable import diagnostics"
+          >
             <table>
               <thead>
                 <tr>
@@ -2127,7 +2460,12 @@ function DataAudit({
 }
 function MetricTable({ metrics }: { metrics: Result["metrics"] }) {
   return (
-    <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable receptor metrics">
+    <div
+      className="table-wrap"
+      tabIndex={0}
+      role="region"
+      aria-label="Scrollable receptor metrics"
+    >
       <table>
         <thead>
           <tr>
@@ -2159,13 +2497,47 @@ function MetricTable({ metrics }: { metrics: Result["metrics"] }) {
     </div>
   );
 }
+function ComparisonOutcome({ data }: { data: Comparison }) {
+  const outcome = comparisonOverview(data);
+  return (
+    <section className="comparison-outcome" aria-label="Comparison findings">
+      <h2>What changes in this preview?</h2>
+      <p>
+        {outcome.lower} assessment locations have a lower end-state tracer value
+        · {outcome.higher} higher · {outcome.unchanged} unchanged
+        {outcome.missing ? ` · ${outcome.missing} unavailable` : ""}.
+      </p>
+      {outcome.protectedWorsening.length ? (
+        <p className="protected-warning" role="status">
+          Protected locations worsen in this run:{" "}
+          {outcome.protectedWorsening.join(", ")}. Review these before
+          interpreting any improvement elsewhere.
+        </p>
+      ) : (
+        <p>
+          No protected-location increase appears in the available paired
+          metrics. This does not establish environmental no-harm.
+        </p>
+      )}
+      <p>
+        Decision status: inconclusive. Small differences may be numerical; these
+        research results cannot establish real exposure benefit.
+      </p>
+    </section>
+  );
+}
 function ComparisonTable({ data }: { data: Comparison }) {
   return (
-    <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable comparison metrics">
+    <div
+      className="table-wrap"
+      tabIndex={0}
+      role="region"
+      aria-label="Scrollable comparison metrics"
+    >
       <table data-testid="comparison-table">
         <thead>
           <tr>
-            <th>Receptor</th>
+            <th>Assessment location</th>
             <th>Baseline µg/m³</th>
             <th>Alternative µg/m³</th>
             <th>Requested → native sample height (m)</th>
@@ -2213,7 +2585,7 @@ function ComparisonTable({ data }: { data: Comparison }) {
                   >
                     {m.delta_ug_m3 !== null && m.delta_ug_m3 > 0
                       ? "Worsens in this run"
-                      : "Protected receptor"}
+                      : "Protected location"}
                   </Badge>
                 ) : (
                   "Not designated"
@@ -2226,16 +2598,143 @@ function ComparisonTable({ data }: { data: Comparison }) {
     </div>
   );
 }
+function SelectedPairSummary({
+  baseline,
+  alternative,
+  baselineRunId,
+  alternativeRunId,
+}: {
+  baseline?: Scenario;
+  alternative?: Scenario;
+  baselineRunId: string;
+  alternativeRunId: string;
+}) {
+  const changes = scenarioChanges(baseline, alternative);
+  return (
+    <section className="selected-pair-summary">
+      <h2>What changed in this selected pair?</h2>
+      <p>
+        <strong>{baseline?.name ?? "Baseline snapshot unavailable"}</strong>{" "}
+        {baseline ? `· v${baseline.version}` : ""} →{" "}
+        <strong>
+          {alternative?.name ?? "Alternative snapshot unavailable"}
+        </strong>{" "}
+        {alternative ? `· v${alternative.version}` : ""}
+      </p>
+      {changes ? (
+        <>
+          {changes.buildings.length ? (
+            <ul>
+              {changes.buildings.map((change) => (
+                <li key={change}>{change}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>Building geometry is unchanged in these frozen snapshots.</p>
+          )}
+          {changes.sources.length ? (
+            <ul>
+              {changes.sources.map((change) => (
+                <li key={change}>{change}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>Declared source inputs are unchanged.</p>
+          )}
+          {changes.locations.length ? (
+            <ul>
+              {changes.locations.map((change) => (
+                <li key={change}>{change}</li>
+              ))}
+            </ul>
+          ) : null}
+        </>
+      ) : (
+        <p>
+          The scenario snapshots are unavailable. Do not infer unchanged inputs
+          from missing evidence.
+        </p>
+      )}
+      <details>
+        <summary>Exact run identities</summary>
+        <p>
+          Baseline: <code>{baselineRunId}</code>
+        </p>
+        <p>
+          Alternative: <code>{alternativeRunId}</code>
+        </p>
+      </details>
+    </section>
+  );
+}
 function ReportView({ report }: { report: Report }) {
   const [downloadError, setDownloadError] = useState<unknown>();
   const [downloading, setDownloading] = useState(false);
   const download = async (format: "html" | "json") => {
     setDownloading(true);
     setDownloadError(undefined);
-    try { await downloadProtected(`/reports/${report.id}/download?format=${format}`, `urban-air-report-${report.id}.${format}`); }
-    catch (error) { setDownloadError(error); }
-    finally { setDownloading(false); }
+    try {
+      await downloadProtected(
+        `/reports/${report.id}/download?format=${format}`,
+        `urban-air-report-${report.id}.${format}`,
+      );
+    } catch (error) {
+      setDownloadError(error);
+    } finally {
+      setDownloading(false);
+    }
   };
+  const manifests = report.manifest.run_manifests as
+    | {
+        conditions?: Conditions;
+        inputs?: Scenario;
+        model_version?: string;
+        tier?: string;
+      }[]
+    | undefined;
+  const base = manifests?.[0],
+    alternative = manifests?.[1];
+  const question =
+    typeof report.manifest.planning_question === "string"
+      ? report.manifest.planning_question
+      : null;
+  const sourcePackages = report.manifest.source_export_packages;
+  const hasOpenStreetMapSource =
+    Array.isArray(sourcePackages) &&
+    sourcePackages.some(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        item.source_compliance?.attribution_url ===
+          "https://www.openstreetmap.org/copyright",
+    );
+  const changed =
+    base?.inputs && alternative?.inputs
+      ? alternative.inputs.buildings
+          .filter((building) => {
+            const original = base.inputs!.buildings.find(
+              (item) => item.id === building.id,
+            );
+            return (
+              !original ||
+              original.height_m !== building.height_m ||
+              JSON.stringify(original.footprint) !==
+                JSON.stringify(building.footprint)
+            );
+          })
+          .map((building) => building.name)
+      : [];
+  const sourceChanges =
+    base?.inputs && alternative?.inputs
+      ? alternative.inputs.sources.flatMap((source) => {
+          const original = base.inputs!.sources.find(
+            (item) => item.id === source.id,
+          );
+          return original && original.rate_g_s !== source.rate_g_s
+            ? [`${source.name}: ${original.rate_g_s} → ${source.rate_g_s} g/s`]
+            : [];
+        })
+      : [];
   return (
     <>
       <div className="report-actions">
@@ -2265,25 +2764,87 @@ function ReportView({ report }: { report: Report }) {
       {downloadError ? <ErrorBox error={downloadError} /> : null}
       <article className="report-preview">
         <span className="eyebrow">URBAN AIR STUDIO / DECISION DRAFT</span>
-        <h1>{report.title}</h1>
+        <h2 className="report-title">{report.title}</h2>
+        {hasOpenStreetMapSource ? (
+          <p className="report-source-attribution">
+            ©{" "}
+            <a href="https://www.openstreetmap.org/copyright">
+              OpenStreetMap contributors
+            </a>{" "}
+            ·{" "}
+            <a href="https://opendatacommons.org/licenses/odbl/1-0/">
+              ODbL 1.0
+            </a>
+            . Reviewed assumptions and alterations are retained in the source
+            compliance package.
+          </p>
+        ) : null}
+        {question ? (
+          <p className="report-purpose">
+            <strong>Planning question</strong>
+            <br />
+            {question}
+          </p>
+        ) : null}
         <p className="report-intro">
           A bounded passive-tracer comparison under frozen conditions. This
           report records actual numerical outputs, exact input identity and
           their research limitations. Values are transient end-state
           concentrations, not averaged exposure or AQI.
         </p>
-        <p className="numerical-caveat">The default mesh is not convergence-qualified. Small differences can be caused by numerical or native-cell sampling effects; this preview cannot establish a real planning benefit.</p>
-        <div className="report-identities">
-          <div>
-            <span>BASELINE RUN</span>
-            <code>{report.baseline_run_id}</code>
+        <p className="numerical-caveat">
+          The default mesh is not convergence-qualified. Small differences can
+          be caused by numerical or native-cell sampling effects; this preview
+          cannot establish a real planning benefit.
+        </p>
+        <section className="report-shared-conditions">
+          <h2>Study pair and shared conditions</h2>
+          <p>
+            {base?.inputs?.name ?? "Baseline"} →{" "}
+            {alternative?.inputs?.name ?? "Alternative"}
+          </p>
+          {base?.conditions ? (
+            <p>
+              Passive tracer · µg/m³ · end state at {base.conditions.duration_s}{" "}
+              s · wind {base.conditions.wind_speed_m_s} m/s from{" "}
+              {base.conditions.wind_from_deg}° · background{" "}
+              {base.conditions.background_ug_m3} µg/m³
+            </p>
+          ) : null}
+          <p>
+            {changed.length
+              ? `Changed building geometry: ${changed.join(", ")}.`
+              : "No building geometry change identified in the frozen pair."}
+          </p>
+          {sourceChanges.length ? (
+            <p>Declared source changes: {sourceChanges.join("; ")}.</p>
+          ) : null}
+          <p>
+            Source and assessment inputs are retained in the evidence appendix.
+          </p>
+        </section>
+        <ComparisonOutcome data={report.comparison} />
+        <h2>Next evidence needed</h2>
+        <p>
+          Review input assumptions, protected-neighbour outcomes, numerical
+          sensitivity and independent site observations before supporting a
+          planning decision. Professional review and scientific validation are
+          still incomplete.
+        </p>
+        <details className="report-evidence-identities">
+          <summary>Exact run identities and provenance</summary>
+          <div className="report-identities">
+            <div>
+              <span>BASELINE RUN</span>
+              <code>{report.baseline_run_id}</code>
+            </div>
+            <div>
+              <span>ALTERNATIVE RUN</span>
+              <code>{report.alternative_run_id}</code>
+            </div>
           </div>
-          <div>
-            <span>ALTERNATIVE RUN</span>
-            <code>{report.alternative_run_id}</code>
-          </div>
-        </div>
-        <h2>Receptor comparison</h2>
+        </details>
+        <h2>Assessment-location comparison</h2>
         <ComparisonTable data={report.comparison} />
         <h2>Limitations & unresolved evidence</h2>
         <ul>
@@ -2291,7 +2852,7 @@ function ReportView({ report }: { report: Report }) {
             <li key={i}>{l}</li>
           ))}
         </ul>
-        <h2>Reproducibility record</h2>
+        <h2>Evidence appendix</h2>
         <p>
           Report checksum: <code>{report.checksum}</code>. Exact provenance,
           method and scenario inputs are included in the downloadable manifest.

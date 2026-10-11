@@ -1,0 +1,38 @@
+[
+  {
+    "source": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+    "bytes": 48256,
+    "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+    "file": "inter-latin-variable.woff2"
+  },
+  {
+    "source": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2",
+    "bytes": 85068,
+    "sha256": "34b9c504cab7a73e37b746343a449132e56cf7b5481af2cb81dc74dcff25c956",
+    "file": "inter-latin-ext-variable.woff2"
+  },
+  {
+    "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2",
+    "bytes": 7748,
+    "sha256": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446",
+    "file": "poppins-latin-500.woff2"
+  },
+  {
+    "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2",
+    "bytes": 8000,
+    "sha256": "f4e80d9dfd374d02989b87a27b5ed4cb78fbb177c27f1478e9a8b0afb7513149",
+    "file": "poppins-latin-600.woff2"
+  },
+  {
+    "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLGT9Z11lFc-K.woff2",
+    "bytes": 39084,
+    "sha256": "f018c9ad67dc6c2ca9743ba407d879a251e778bfb3f1cced9dd59a9214ea0350",
+    "file": "poppins-devanagari-500.woff2"
+  },
+  {
+    "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6Z11lFc-K.woff2",
+    "bytes": 39292,
+    "sha256": "58dba357cb1e89bf36e83f19227293f35d5d7de91215d0fcf394e705634837b5",
+    "file": "poppins-devanagari-600.woff2"
+  }
+]

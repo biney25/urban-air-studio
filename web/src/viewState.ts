@@ -1,9 +1,4 @@
-export const gatedViews = [
-  "assistant",
-  "optimisations",
-  "review",
-  "settings",
-];
+export const gatedViews = ["optimisations", "review", "settings"];
 const availableViews = [
   "explore",
   "data",
@@ -20,6 +15,7 @@ const availableViews = [
   "exports",
   "evidence",
   "investigate",
+  "assistant",
 ];
 export function projectView(path: string) {
   const sub = path.split("/").slice(3);

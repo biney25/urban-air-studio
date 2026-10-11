@@ -80,6 +80,12 @@ def jwks_client(issuer):
 
 
 def request_identity(request: Request):
+    # A report capability is deliberately not a planner login. Never fall back
+    # to the loopback development owner when a review credential is supplied.
+    authorization = request.headers.get("authorization", "")
+    parts = authorization.split()
+    if len(parts) == 2 and parts[0].lower() == "bearer" and parts[1].lower().startswith("uarv1_"):
+        reject("REVIEW_SCOPE_DENIED", "This review link only permits its frozen report and review comments", 403)
     config = public_config()
     if not config["configured"]:
         reject("AUTH_NOT_CONFIGURED", "Deployment identity settings are incomplete; access is closed", 503)

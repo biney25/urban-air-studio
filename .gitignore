@@ -24,3 +24,23 @@ infra/terraform/.terraform/
 .env.*
 !.env.example
 
+# Private references, checkpoints, live evidence and local tooling are retained
+# on disk. Public releases are prepared from an explicit audited allowlist.
+output/
+sources/
+runtime/
+validation/
+tmp/
+.codex/
+.agents/
+.aws/
+attachments/
+web/node_modules/
+docs/review/ui-evidence/
+datasets/phase_b/benchmarks/
+*.sqlite3*
+*.db
+*.zip
+*.bundle
+*.log
+

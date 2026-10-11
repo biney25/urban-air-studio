@@ -444,60 +444,6 @@
   },
   {
     "ecosystem": "node",
-    "name": "cesium",
-    "version": "1.146.0",
-    "declared_license": "Apache-2.0",
-    "retained_license_files": [
-      "third_party/node/cesium/LICENSE.md"
-    ]
-  },
-  {
-    "ecosystem": "node",
-    "name": "lucide-react",
-    "version": "0.468.0",
-    "declared_license": "ISC",
-    "retained_license_files": [
-      "third_party/node/lucide-react/LICENSE"
-    ]
-  },
-  {
-    "ecosystem": "node",
-    "name": "oidc-client-ts",
-    "version": "3.5.0",
-    "declared_license": "Apache-2.0",
-    "retained_license_files": [
-      "third_party/node/oidc-client-ts/LICENSE"
-    ]
-  },
-  {
-    "ecosystem": "node",
-    "name": "react",
-    "version": "19.3.0",
-    "declared_license": "MIT",
-    "retained_license_files": [
-      "third_party/node/react/LICENSE"
-    ]
-  },
-  {
-    "ecosystem": "node",
-    "name": "react-dom",
-    "version": "19.3.0",
-    "declared_license": "MIT",
-    "retained_license_files": [
-      "third_party/node/react-dom/LICENSE"
-    ]
-  },
-  {
-    "ecosystem": "node",
-    "name": "react-router-dom",
-    "version": "7.18.4",
-    "declared_license": "MIT",
-    "retained_license_files": [
-      "third_party/node/react-router-dom/LICENSE.md"
-    ]
-  },
-  {
-    "ecosystem": "node",
     "name": "@types/node",
     "version": "22.20.5",
     "declared_license": "MIT",
@@ -543,11 +489,74 @@
   },
   {
     "ecosystem": "node",
+    "name": "cesium",
+    "version": "1.146.0",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/node/cesium/LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "lucide-react",
+    "version": "0.468.0",
+    "declared_license": "ISC",
+    "retained_license_files": [
+      "third_party/node/lucide-react/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "maplibre-gl",
+    "version": "6.13.0",
+    "declared_license": "BSD-3-Clause",
+    "retained_license_files": [
+      "third_party/node/maplibre-gl/LICENSE.txt"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "oidc-client-ts",
+    "version": "3.5.0",
+    "declared_license": "Apache-2.0",
+    "retained_license_files": [
+      "third_party/node/oidc-client-ts/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
     "name": "prettier",
     "version": "3.9.9",
     "declared_license": "MIT",
     "retained_license_files": [
       "third_party/node/prettier/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "react",
+    "version": "19.3.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/react/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "react-dom",
+    "version": "19.3.0",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/react-dom/LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "node",
+    "name": "react-router-dom",
+    "version": "7.18.4",
+    "declared_license": "MIT",
+    "retained_license_files": [
+      "third_party/node/react-router-dom/LICENSE.md"
     ]
   },
   {

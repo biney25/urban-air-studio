@@ -46,6 +46,10 @@ export interface Project {
   name: string;
   created_at: string;
   baseline_scenario_id: string | null;
+  category?: "user" | "sample" | "internal_test" | null;
+  planning_question?: string | null;
+  site?: {latitude: number; longitude: number; width_km: 0.25 | 0.5 | 1} | null;
+  planning_brief_id?: string | null;
 }
 export type Conditions = Required<Contract.Conditions>;
 export interface Field {

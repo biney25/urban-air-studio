@@ -13,6 +13,7 @@
     "@tanstack/react-query": "^5.81.5",
     "cesium": "^1.130.0",
     "lucide-react": "^0.468.0",
+    "maplibre-gl": "6.13.0",
     "oidc-client-ts": "^3.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

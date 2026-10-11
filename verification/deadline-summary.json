@@ -1,0 +1,33 @@
+{
+  "scope": "Current local map-first reviewed baseline/edit/constraint/real-run comparison/report workflow; bounded source-control alternatives; report-scoped expiring/revocable read/comment/download capabilities; real local Cedar and previously verified Strands. No validated environmental, optimal-design, enterprise or citywide scientific release.",
+  "python_counts": {
+    "tests": 1004,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontend_counts": {
+    "tests": 274,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "browser_audits": {
+    "new_feature_complete": 18,
+    "final_core_continuation": 12,
+    "design_completed_before_owner_pause": 4,
+    "detected_violations": 0,
+    "manual_device_user_validation_complete": false
+  },
+  "qualified": false,
+  "aws_deployed": false,
+  "spend_usd": 0,
+  "assistant": {
+    "actual_evaluated_tasks": 12,
+    "output_guard_accepted": 8,
+    "output_guard_blocked": 4,
+    "full_40_task_gate": false
+  },
+  "private_receipts_omitted": true,
+  "scientific_gates": "ABL/mesh/physical/observational/independent/professional gates remain open"
+}

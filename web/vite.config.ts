@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { rewriteCesiumGlobal } from "./build/cesiumCsp";
+import { LOCAL_PREVIEW_CSP } from "./build/browserPolicy";
 export default defineConfig({
   plugins: [react(), {
     name: "cesium-csp-global",
@@ -18,6 +19,15 @@ export default defineConfig({
         target: process.env.UAS_API_TARGET ?? "http://127.0.0.1:8000",
         changeOrigin: false,
       },
+    },
+  },
+  preview: {
+    port: 5180,
+    strictPort: true,
+    headers: {
+      "Content-Security-Policy": LOCAL_PREVIEW_CSP,
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
     },
   },
   build: { target: "es2022", chunkSizeWarningLimit: 1800 },

@@ -2,6 +2,7 @@
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import hashlib
+import base64
 import html
 import json
 import logging
@@ -21,6 +22,7 @@ from api.storage import ACTIVE, TERMINAL, Store, canonical, digest, new_id, utc_
 from api import responses as response
 from api.auth import Identity, request_identity, public_config
 from api.readiness import Readiness
+from api.planning import ProjectCreate, check_constraints, latest_brief, validate_programme
 
 
 class BoundedBodyMiddleware:
@@ -89,7 +91,20 @@ def project_resource(value, project_id):
 
 def physical_hash(scenario):
     keys = ["origin", "coordinate_frame", "analysis_domain", "buildings", "sources", "receptors", "source_rights", "source_label"]
+    if scenario.get("source_preparation"):
+        keys.append("source_preparation")
     return digest({key:scenario.get(key) for key in keys})
+
+
+def require_scenario_permission(store, scenario, identity, action, db=None):
+    from api.authorization import Authorizer, PermissionCheck
+    if scenario.get("source_preparation"):
+        from api.site_preparation import checked_preparation_dependency
+        checked_preparation_dependency(store, scenario, identity.tenant_id, error, db)
+    gate = PermissionCheck(Authorizer())
+    gate.require(identity, scenario["project_id"], action=action, identifier=scenario["id"],
+                 tenant_id=identity.tenant_id, resource_project_id=scenario["project_id"], rights=scenario.get("source_rights", {}))
+    return gate
 
 
 def reject_inventory_preview(scenario):
@@ -155,6 +170,10 @@ def new_run(project, scenario, quote, attempt=1, retry_of=None):
                 "qualification":"research_preview", "validation_records":qualification_records(),
                 "resource_allowance_seconds":quote["maximum_seconds"]/quote["cases"],
                 "limitations":quote["limitations"]}
+    if quote.get("planning_brief"):
+        manifest["planning_brief"] = deepcopy(quote["planning_brief"])
+        manifest["planning_brief_hash"] = quote["planning_brief"]["content_hash"]
+        manifest["constraint_assessment"] = check_constraints(scenario, quote["planning_brief"])
     return {"id":new_id("run"), "project_id":project, "scenario_id":scenario["id"],
             "status":"queued", "stage":"queued", "progress":0, "created_at":utc_now(),
             "manifest":manifest, "result":None, "error":None, "cancel_requested":False,
@@ -185,6 +204,8 @@ def compare(store, project_id, body, identity):
     for key in ["species", "tier", "model_version", "science_build_hash", "dependency_versions", "conditions"]:
         if manifests[0][key] != manifests[1][key]:
             reasons.append({"field":key, "message":"Frozen values differ"})
+    if manifests[0].get("planning_brief_hash") != manifests[1].get("planning_brief_hash"):
+        reasons.append({"field":"planning_brief", "message":"Planning requirements differ between studies"})
     def receptor_support(manifest):
         scenario = manifest["inputs"]
         return {"origin":scenario["origin"], "coordinate_frame":scenario.get("coordinate_frame"),
@@ -234,6 +255,21 @@ def reference_hashes():
             for name in files if (root/name).is_file()}
 
 
+def checked_report(store, report, identity):
+    original = {k:v for k,v in report.items() if not k.startswith("_") and k != "checksum"}
+    if digest(original) != report.get("checksum"):
+        error("REPORT_INTEGRITY_ERROR", "Report contents no longer match their frozen identity", 503)
+    if report.get("_html_sha256") and hashlib.sha256(report["_html"].encode("utf-8")).hexdigest() != report["_html_sha256"]:
+        error("REPORT_INTEGRITY_ERROR", "Report document failed integrity checks", 503)
+    from api.research_export import admitted_package
+    for manifest in report.get("manifest",{}).get("run_manifests",[]):
+        inputs = manifest["inputs"]
+        if inputs["project_id"] != report["project_id"]:
+            error("REPORT_INTEGRITY_ERROR", "Report source belongs to another project", 503)
+        admitted_package(store, inputs, identity, error)
+    return report
+
+
 def report_html(report, outputs):
     def esc(value):
         return html.escape(str(value))
@@ -256,17 +292,51 @@ def report_html(report, outputs):
             color = "#cbd5e1" if v is None else f"hsl({240-210*min(1,max(0,v/bound)):.2f},65%,55%)"
             cells.append(f'<rect x="{index%field["nx"]}" y="{field["ny"]-1-index//field["nx"]}" width="1" height="1" fill="{color}"/>')
         maps.append(f'<figure><figcaption>{label}; slice {field["height_m"]:.3g} m AGL; same scale 0–{bound:.4g} ug/m³</figcaption><svg role="img" aria-label="{label} concentration slice" viewBox="0 0 {field["nx"]} {field["ny"]}">{"".join(cells)}</svg></figure>')
+    manifest = report["manifest"]
+    run_manifests = manifest["run_manifests"]
+    conditions = run_manifests[0]["conditions"]
+    metrics = report["comparison"]["metrics"]
+    worsened = [m for m in metrics if m["protected"] and m["delta_ug_m3"] is not None and m["delta_ug_m3"] > 0]
+    neighbour_notice = ("Protected locations with a positive preview delta: " + ", ".join(m["name"] for m in worsened)) if worsened else "No positive delta at the valid protected locations in this preview. Physical no-harm is not established."
+    assessments = [r.get("constraint_assessment") for r in run_manifests]
+    constraint_text = "Declared geometry requirements: " + " / ".join(a["status"] if a else "not configured" for a in assessments) + ". This is not a planning-code or environmental safety certification."
+    changed = []
+    for group in ("buildings", "sources", "receptors"):
+        before = {v["id"]:v for v in run_manifests[0]["inputs"][group]}
+        after = {v["id"]:v for v in run_manifests[1]["inputs"][group]}
+        for identifier in sorted(set(before) | set(after)):
+            if before.get(identifier) != after.get(identifier):
+                keys = [key for key in set((before.get(identifier) or {})) | set((after.get(identifier) or {})) if (before.get(identifier) or {}).get(key) != (after.get(identifier) or {}).get(key)]
+                changed.append(f"{group[:-1].capitalize()} {identifier}: {', '.join(sorted(keys))}")
+    source_packages = manifest.get("source_export_packages", [])
+    source_notices = "".join(f"<p>{esc(p['source_compliance']['notice'])}</p>" for p in source_packages if p.get("source_compliance"))
+    if source_notices:
+        source_notices += '<p>ODbL notices and machine-readable original objects, derivative inputs and alterations are included in the reproduction appendix and JSON report.</p>'
+    fonts_dir = Path(__file__).resolve().parents[1] / "web/public/fonts"
+    font_css = ""
+    for family, filename, weight in [("Inter", "inter-latin-variable.woff2", "100 900"), ("Poppins", "poppins-latin-600.woff2", "600")]:
+        path = fonts_dir / filename
+        if path.is_file():
+            font_css += f"@font-face{{font-family:{family};font-style:normal;font-weight:{weight};src:url(data:font/woff2;base64,{base64.b64encode(path.read_bytes()).decode('ascii')}) format('woff2')}}"
+    font_licences = "\n\n".join((fonts_dir / f).read_text(encoding="utf-8") for f in ["inter-OFL.txt", "poppins-OFL.txt"] if (fonts_dir / f).is_file())
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><title>{esc(report["title"])}</title>
-<style>body{{font:15px system-ui;color:#172033;max-width:1000px;margin:32px auto;padding:20px}}h1{{font-size:28px}}.notice{{background:#fff3cf;padding:16px;border-left:4px solid #c88c1b}}table{{border-collapse:collapse;width:100%}}td,th{{border:1px solid #cbd5e1;padding:9px;text-align:left}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}}.maps{{display:flex;gap:20px}}figure{{width:48%;margin:0}}svg{{width:100%;background:#eef2f6}}@media print{{body{{margin:0}}pre{{font-size:9px}}}}</style>
+<style>{font_css}body{{font:16px/1.5 Inter,system-ui;color:#172033;max-width:1100px;margin:32px auto;padding:24px}}h1,h2{{font-family:Poppins,system-ui;font-weight:600}}h1{{font-size:28px}}h2{{font-size:20px;margin-top:28px}}.notice{{background:#fff3cf;padding:16px;border-left:4px solid #c88c1b}}.neighbours{{padding:16px;border:1px solid #c88c1b;border-radius:8px}}table{{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}}.table-scroll{{overflow-x:auto}}td,th{{border:1px solid #cbd5e1;padding:10px;text-align:left}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 ui-monospace,monospace}}summary{{cursor:pointer;font-weight:600;padding:12px 0}}.maps{{display:flex;gap:20px}}figure{{width:48%;margin:0}}svg{{width:100%;background:#eef2f6}}@media(max-width:700px){{.maps{{display:block}}figure{{width:100%;margin-bottom:20px}}body{{margin:0;padding:16px}}}}@media print{{body{{margin:0}}details{{break-before:page}}}}</style>
 <h1>{esc(report["title"])}</h1><p>Draft · {esc(report["created_at"])} · {esc(report["id"])}</p>
 <div class="notice"><strong>Executed research preview — no site validation or decision qualification.</strong> Passive tracer, ug/m³; conditional end-of-run concentration, not regulatory AQI or measured air quality. Geometry and sources are user-supplied/unverified.</div>
+<h2>Planning question</h2><p>{esc(manifest.get('planning_question') or 'Compare the retained baseline with the declared alternative under the same study conditions.')}</p>
+<h2>What changed</h2><ul>{''.join(f'<li>{esc(item)}</li>' for item in changed) or '<li>No physical input change in this pair.</li>'}</ul>
+<h2>Conditions and feasibility</h2><p>Wind {value(conditions['wind_speed_m_s'])} m/s from {value(conditions['wind_from_deg'])}°; background {value(conditions['background_ug_m3'])} ug/m³; duration {value(conditions['duration_s'])} s. These are declared conditions, not a measured site forecast.</p><p>{esc(constraint_text)}</p>
+<div class="neighbours"><strong>Neighbour check</strong><p>{esc(neighbour_notice)}</p></div>
+<h2>Decision status: inconclusive for real-world benefit</h2><p>The executed comparison can support further investigation. The method and default mesh are not qualified to establish a real exposure reduction or approve a design. Obtain independent numerical and site evidence before using the preview for a planning decision.</p>
 <h2>Exact comparison</h2><p>Alternative minus baseline; positive values worsen concentration. No health or real-world reduction claim is supported.</p>
 <p>Temporal support: end state at {esc(report['manifest']['run_manifests'][0]['conditions']['duration_s'])} seconds after start; no temporal averaging. Receptors sample the piecewise constant value of the containing native 3D cell. Requested height and actual cell-centre height are shown separately.</p>
-<table><thead><tr><th>Receptor</th><th>Requested → native height</th><th>Baseline ug/m³</th><th>Alternative ug/m³</th><th>Signed delta ug/m³</th><th>Change</th><th>Protected</th></tr></thead><tbody>{rows}</tbody></table>
+<div class="table-scroll"><table><thead><tr><th>Assessment location</th><th>Requested → native height</th><th>Baseline ug/m³</th><th>Alternative ug/m³</th><th>Signed delta ug/m³</th><th>Change</th><th>Protected</th></tr></thead><tbody>{rows}</tbody></table></div>
 <p>Percentages are suppressed for invalid samples or baselines below 0.005 ug/m³, a presentation denominator floor for a two-decimal display. This is not a detection limit or health threshold; absolute deltas remain available.</p>
 <h2>Fixed-scale fields</h2><div class="maps">{"".join(maps)}</div><p>Grey cells are masked/no data; rendering is separate from authoritative receptor samples.</p>
 <h2>Limits and unresolved evidence</h2><ul>{"".join(f"<li>{esc(item)}</li>" for item in report["limitations"])}</ul>
-<h2>Methods, frozen inputs, provenance and reproducibility</h2><pre>{esc(json.dumps(report["manifest"],indent=2,ensure_ascii=False))}</pre>
+<h2>Source permissions and attribution</h2>{source_notices or '<p>Permitted user-supplied research inputs. Their declared permissions are retained with the frozen source records.</p>'}
+<details><summary>Methods, frozen inputs, provenance and reproducibility</summary><pre>{esc(json.dumps(report["manifest"],indent=2,ensure_ascii=False))}</pre></details>
+<details><summary>Bundled typeface licences</summary><pre>{esc(font_licences)}</pre></details>
 <p>Report content checksum: {esc(report["checksum"])}</p></html>'''
 
 
@@ -279,6 +349,15 @@ def create_app(directory=None):
     @app.middleware("http")
     async def local_limits(request, call_next):
         request.state.request_id = uuid.uuid4().hex
+        authorization = request.headers.get("authorization", "").split()
+        if (len(authorization) == 2 and authorization[0].lower() == "bearer"
+                and authorization[1].lower().startswith("uarv1_")
+                and request.url.path not in {"/api/review/report", "/api/review/report/comments", "/api/review/report/download"}):
+            return JSONResponse(status_code=403, content={"detail": {
+                "code": "REVIEW_SCOPE_DENIED",
+                "message": "This review link only permits its frozen report and review comments"}},
+                headers={"Cache-Control": "no-store", "X-Request-ID": request.state.request_id,
+                         "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer"})
         length = request.headers.get("content-length")
         if length and (not length.isdigit() or int(length) > 5_000_000):
             return JSONResponse(status_code=413, content={"detail":{"code":"IMPORT_LIMIT_EXCEEDED", "message":"Request exceeds 5 MB local allowance"}})
@@ -286,7 +365,8 @@ def create_app(directory=None):
         response.headers["Cache-Control"] = "no-store"
         response.headers["X-Request-ID"] = request.state.request_id
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["Content-Security-Policy"] = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'" if request.url.path.endswith("/download") else "frame-ancestors 'none'"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Content-Security-Policy"] = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:; frame-ancestors 'none'" if request.url.path.endswith("/download") else "frame-ancestors 'none'"
         return response
 
     @app.exception_handler(Exception)
@@ -323,12 +403,18 @@ def create_app(directory=None):
     @app.get("/api/capabilities")
     def capabilities(identity=Depends(local_identity), store=Depends(get_store)):
         from science import MODEL_VERSION
-        return {"phase":"A", "model_version":MODEL_VERSION, "supported_tiers":["T0","T1"],
-                "capability_statuses":{"T0":"implemented_geometry_diagnostics", "T1":"research_preview_unvalidated", "T2":"not_implemented"},
+        from api.assistant import LocalModel
+        assistant = LocalModel().status()
+        return {"phase":"A/B engineering; C/D deadline increments", "model_version":MODEL_VERSION, "supported_tiers":["T0","T1"],
+                "capability_statuses":{"T0":"implemented_geometry_diagnostics", "T1":"research_preview_unvalidated", "T2":"native_diagnostics_not_qualified_for_decision_comparison"},
                 "species":["passive_tracer"], "imports":["GeoJSON Polygon/Point"],
                 "identity":os.getenv("UA_MODE", "local"), "storage":store.adapter_name,
-                "ai_available":False, "cloud_deployed":False, "validated":False,
-                "limitations":["Bounded research preview, not urban CFD validation", "No external data-provider inputs or credentials"]}
+                "operator_views_available":os.getenv("UA_MODE", "local") == "local",
+                "ai_available":assistant["state"] in {"ready", "busy"},
+                "study_assistant":{"state":assistant["state"], "scope":"reviewed local study tools", "qualified":False},
+                "cloud_deployed":False, "validated":False,
+                "geographic_context":{"map_navigation":"Delhi/India and supported worldwide coordinates", "providers":["OSM geometry", "Open-Meteo GFS weather context"], "semantic_preparation":"review_required", "national_scientific_coverage":False},
+                "limitations":["Bounded research preview, not urban CFD validation", "Context coverage does not establish source permissions, measured inputs or scientific qualification", "Native numerical/scientific qualification remains incomplete"]}
 
     @app.get("/api/fixtures/campus")
     def fixture(identity=Depends(local_identity)):
@@ -340,8 +426,10 @@ def create_app(directory=None):
         return store.list("project", identity.tenant_id)
 
     @app.post("/api/projects", status_code=201,response_model=response.Project)
-    def project_create(body: Named, identity=Depends(local_identity), store=Depends(get_store)):
-        project = {"id":new_id("project"), "name":body.name, "created_at":utc_now(), "baseline_scenario_id":None}
+    def project_create(body: ProjectCreate, identity=Depends(local_identity), store=Depends(get_store)):
+        project = {"id":new_id("project"), "name":body.name, "created_at":utc_now(), "baseline_scenario_id":None,
+                   "category":body.category, "planning_question":body.planning_question,
+                   "site":body.site.model_dump() if body.site else None,"planning_brief_id":None}
         with store.transaction() as db:
             Store.put(db, "project", identity.tenant_id, project)
         return project
@@ -352,7 +440,7 @@ def create_app(directory=None):
         return {"project":project, "scenarios":store.list("scenario", identity.tenant_id, project_id),
                 "runs":[public_run(store, run) for run in store.list_runs(identity.tenant_id, project_id)],
                 "imports":store.list("import", identity.tenant_id, project_id),
-                "reports":[{k:v for k,v in report.items() if not k.startswith("_")} for report in store.list("report",identity.tenant_id,project_id)]}
+                "reports":[{k:v for k,v in checked_report(store, report, identity).items() if not k.startswith("_")} for report in store.list("report",identity.tenant_id,project_id)]}
 
     @app.post("/api/projects/{project_id}/imports", status_code=201,response_model=response.ImportResponse)
     def import_create(project_id: str, body: ImportRequest, identity=Depends(local_identity), store=Depends(get_store)):
@@ -382,6 +470,7 @@ def create_app(directory=None):
         with store.transaction() as db:
             project = required(store, "project", project_id, identity, db)
             scenario = project_resource(required(store, "scenario", body.scenario_id, identity, db), project_id)
+            require_scenario_permission(store, scenario, identity, "derive", db)
             if not scenario.get("diagnostics"):
                 error("GEOMETRY_NOT_AUDITED", "An audited snapshot is required")
             project["baseline_scenario_id"] = scenario["id"]
@@ -396,6 +485,7 @@ def create_app(directory=None):
     @app.post("/api/scenarios/{scenario_id}/branch", status_code=201,response_model=response.Scenario)
     def branch(scenario_id: str, body: Named, identity=Depends(local_identity), store=Depends(get_store)):
         parent = required(store, "scenario", scenario_id, identity)
+        require_scenario_permission(store, parent, identity, "derive")
         result = scenario_version(parent, parent["project_id"], body.name, parent)
         with store.transaction() as db:
             Store.put(db, "scenario", identity.tenant_id, result, parent["project_id"])
@@ -405,6 +495,7 @@ def create_app(directory=None):
     def operations(scenario_id: str, body: OperationsRequest, identity=Depends(local_identity), store=Depends(get_store)):
         from science.geometry import validate_scenario
         parent = required(store, "scenario", scenario_id, identity)
+        require_scenario_permission(store, parent, identity, "derive")
         if parent["version"] != body.expected_version:
             error("VERSION_CONFLICT", "Expected version does not match immutable snapshot", 409)
         core = deepcopy(parent)
@@ -427,6 +518,11 @@ def create_app(directory=None):
             else:
                 obj.update(changes)
         core["diagnostics"] = scientific_call(validate_scenario, core)
+        brief = latest_brief(store, parent["project_id"], identity)
+        if brief:
+            assessment = check_constraints(core, brief, parent)
+            if not assessment["valid"]:
+                error("PLANNING_CONSTRAINT_FAILED", "Alternative violates declared planning requirements", 422, assessment["issues"])
         result = scenario_version(core, parent["project_id"], parent["name"], parent, [op.model_dump(exclude_none=True) for op in body.operations])
         with store.transaction() as db:
             Store.put(db, "scenario", identity.tenant_id, result, parent["project_id"])
@@ -437,18 +533,25 @@ def create_app(directory=None):
         from science.geometry import validate_scenario
         from science.model import make_grid
         required(store, "project", project_id, identity)
+        brief = latest_brief(store, project_id, identity)
         grid_sizes = []
         for identifier in body.scenario_ids:
             scenario = project_resource(required(store, "scenario", identifier, identity), project_id)
+            require_scenario_permission(store, scenario, identity, "solve")
             reject_inventory_preview(scenario)
             if not scenario.get("source_rights", {}).get("solve"):
                 error("LICENCE_USE_BLOCKED", "Solver-use permission is required", 403)
             scientific_call(validate_scenario, scenario)
+            if brief:
+                assessment = check_constraints(scenario, brief)
+                if not assessment["valid"]:
+                    error("PLANNING_CONSTRAINT_FAILED", "Study inputs violate declared planning requirements", 422, assessment["issues"])
             grid = scientific_call(make_grid, scenario)
             grid_sizes.append({"scenario_id":identifier,"nx":grid.nx,"ny":grid.ny,"nz":grid.nz,"cells":grid.nx*grid.ny*grid.nz})
         result = {"id":new_id("quote"), "project_id":project_id, "scenario_ids":body.scenario_ids,
                   "conditions":body.conditions.model_dump(), "tier":"T1", "cases":len(body.scenario_ids),
                   "maximum_seconds":120*len(body.scenario_ids),
+                  "planning_brief":deepcopy(brief),
                   "preflight_grid_sizes":grid_sizes,
                   "expires_at":(datetime.now(timezone.utc)+timedelta(minutes=15)).isoformat(),
                   "limitations":["Local wall-time allowance, not currency or an empirically calibrated cloud quote",
@@ -481,7 +584,10 @@ def create_app(directory=None):
                                 (identity.tenant_id,)).fetchone()[0]
             if active+quote["cases"] > 16:
                 error("BUDGET_EXCEEDED", "Local tenant allowance is 16 active cases", 409)
-            runs = [new_run(project_id, project_resource(required(store,"scenario",i,identity,db),project_id), quote) for i in quote["scenario_ids"]]
+            inputs = [project_resource(required(store,"scenario",i,identity,db),project_id) for i in quote["scenario_ids"]]
+            for scenario in inputs:
+                require_scenario_permission(store, scenario, identity, "solve", db)
+            runs = [new_run(project_id, scenario, quote) for scenario in inputs]
             for run in runs:
                 Store.insert_run(db, identity.tenant_id, run)
             db.execute("INSERT INTO submissions VALUES(?,?,?,?,?)", (identity.tenant_id,project_id,body.idempotency_key,request_hash,canonical([r["id"] for r in runs])))
@@ -551,35 +657,44 @@ def create_app(directory=None):
 
     @app.post("/api/projects/{project_id}/reports", status_code=201,response_model=response.Report)
     def report_create(project_id: str, body: ReportRequest, identity=Depends(local_identity), store=Depends(get_store)):
-        required(store,"project",project_id,identity)
+        project = required(store,"project",project_id,identity)
         comparison = compare(store,project_id,body,identity)
         runs = [required_run(store,i,identity) for i in [body.baseline_run_id,body.alternative_run_id]]
-        if any(not run["manifest"]["rights"].get("export") for run in runs):
-            error("LICENCE_USE_BLOCKED", "Both input packages require report/export permission", 403)
+        from api.research_export import admitted_package
+        exports = [admitted_package(store, r["manifest"]["inputs"], identity, error) for r in runs]
         outputs = [read_run_bundle(store, run) for run in runs]
         report = {"id":new_id("report"),"project_id":project_id,"title":body.title,"status":"draft", "created_at":utc_now(),
                   "baseline_run_id":body.baseline_run_id,"alternative_run_id":body.alternative_run_id,"comparison":comparison,
                   "limitations":comparison["limitations"],"manifest":{"schema_version":"phase-a-report-v1",
                     "run_manifests":[r["manifest"] for r in runs],"artifact_manifests":[o["artifact_manifest"] for o in outputs],
                     "reference_hashes":reference_hashes(),"approval":"Not reviewed or scientifically validated",
+                    "planning_question":runs[0]["manifest"].get("planning_brief",{}).get("requirements",{}).get("question") or project.get("planning_question"),
+                    "project_name":project["name"], "source_export_packages":exports,
                     "omissions":["No independent site measurements","No field-season validation","No uncertainty ensemble",
                                  "No planning feasibility certification","No health inference"]}}
         report["checksum"] = digest(report)
         report["_html"] = report_html(report, [o["result"] for o in outputs])
+        report["_html_sha256"] = hashlib.sha256(report["_html"].encode("utf-8")).hexdigest()
         with store.transaction() as db:
             Store.put(db,"report",identity.tenant_id,report,project_id)
         return {k:v for k,v in report.items() if not k.startswith("_")}
 
     @app.get("/api/reports/{report_id}",response_model=response.Report)
     def report_get(report_id: str, identity=Depends(local_identity), store=Depends(get_store)):
-        report=required(store,"report",report_id,identity)
+        report=checked_report(store, required(store,"report",report_id,identity), identity)
         for manifest in report.get("manifest",{}).get("run_manifests",[]):
             reject_inventory_preview(manifest.get("inputs"))
         return {k:v for k,v in report.items() if not k.startswith("_")}
 
+    @app.get("/api/projects/{project_id}/reports", response_model=list[response.Report])
+    def report_list(project_id: str, identity=Depends(local_identity), store=Depends(get_store)):
+        required(store, "project", project_id, identity)
+        return [{k:v for k,v in checked_report(store, report, identity).items() if not k.startswith("_")}
+                for report in store.list("report", identity.tenant_id, project_id)]
+
     @app.get("/api/reports/{report_id}/download")
     def report_download(report_id: str, format: str="html", identity=Depends(local_identity), store=Depends(get_store)):
-        report = required(store,"report",report_id,identity)
+        report = checked_report(store, required(store,"report",report_id,identity), identity)
         for manifest in report.get("manifest",{}).get("run_manifests",[]):
             reject_inventory_preview(manifest.get("inputs"))
         headers = {"Content-Disposition":f'attachment; filename="{report_id}.{format if format in {"html","json"} else "txt"}"'}
@@ -592,6 +707,9 @@ def create_app(directory=None):
     from api.phase_b import make_router, install_openapi_contract
     from api.authorization import Authorizer
     app.state.authorization=Authorizer()
+    from api.planning import make_router as planning_router
+    app.include_router(planning_router(identity_dependency=local_identity,store_dependency=get_store,
+                                       required=required,project_resource=project_resource,error=error))
     app.include_router(make_router(identity_dependency=local_identity,store_dependency=get_store,
                                   required=required,project_resource=project_resource,error=error,
                                   physical_hash=physical_hash,authorizer=app.state.authorization))
@@ -599,6 +717,30 @@ def create_app(directory=None):
     app.include_router(detailed_router(identity_dependency=local_identity,store_dependency=get_store,
                                        required=required,project_resource=project_resource,error=error,
                                        physical_hash=physical_hash,authorizer=app.state.authorization))
+    from api.explore import ExploreBroker, make_router as explore_router
+    app.state.explore_broker = ExploreBroker()
+    app.include_router(explore_router(identity_dependency=local_identity,store_dependency=get_store,
+                                     required=required,error=error))
+    from api.site_preparation import make_router as preparation_router
+    app.include_router(preparation_router(identity_dependency=local_identity,store_dependency=get_store,
+                                         required=required,project_resource=project_resource,error=error,
+                                         authorizer=app.state.authorization))
+    from api.assistant import make_router as assistant_router
+    app.include_router(assistant_router(identity_dependency=local_identity,store_dependency=get_store,
+                                       required=required,project_resource=project_resource,
+                                       authorizer=app.state.authorization,compare=compare,constraint_validator=validate_programme))
+    from api.research_export import make_router as export_router
+    app.include_router(export_router(identity_dependency=local_identity,store_dependency=get_store,
+                                    required=required,error=error,authorizer=app.state.authorization))
+    from api.response_study import make_router as response_study_router
+    app.include_router(response_study_router(identity_dependency=local_identity,store_dependency=get_store,
+                                            required=required,project_resource=project_resource,
+                                            physical_hash=physical_hash,scenario_version=scenario_version,
+                                            authorizer=app.state.authorization,constraint_validator=validate_programme,
+                                            compare=compare))
+    from api.report_review import make_router as report_review_router
+    app.include_router(report_review_router(identity_dependency=local_identity,store_dependency=get_store,
+                                           required=required,error=error,checked_report=checked_report))
     install_openapi_contract(app)
     app.add_middleware(BoundedBodyMiddleware)
     return app

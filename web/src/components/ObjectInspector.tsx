@@ -38,9 +38,37 @@ export default function ObjectInspector({
   if (!selected || !object)
     return (
       <p className="inspector-message">
-        Select a building, source or receptor to inspect its inputs.
+        Select a building, source or assessment location on the plan or in the
+        list to review and edit it.
       </p>
     );
+  const edits: string[] = [];
+  const changedValue = (
+    label: string,
+    before: number,
+    after: number,
+    unit: string,
+  ) => {
+    if (before !== after)
+      edits.push(
+        `${label}: ${formatValue(before, 3)} → ${formatValue(after, 3)} ${unit}`,
+      );
+  };
+  if (building) {
+    changedValue("Height", building.height_m, height, "m");
+    if (rotation)
+      edits.push(`Rotate ${formatValue(rotation, 1)}° from this version`);
+    if (dx || dy)
+      edits.push(
+        `Move ${formatValue(dx, 1)} m east and ${formatValue(dy, 1)} m north`,
+      );
+  } else {
+    if (source)
+      changedValue("Declared source rate", source.rate_g_s, rate, "g/s");
+    changedValue("East", (source ?? receptor)!.x, x, "m");
+    changedValue("North", (source ?? receptor)!.y, y, "m");
+    changedValue("Height", (source ?? receptor)!.z, z, "m");
+  }
   return (
     <form
       className="object-inspector"
@@ -218,13 +246,25 @@ export default function ObjectInspector({
           ) : null}
         </>
       )}
+      <div className="edit-review" aria-label="Pending edit review">
+        <h3>{edits.length ? "Review this edit" : "No unsaved changes"}</h3>
+        {edits.length ? (
+          <ul>
+            {edits.map((edit) => (
+              <li key={edit}>{edit}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>Change an input above to save a new alternative version.</p>
+        )}
+      </div>
       <button
         data-testid="apply-edit"
         type="submit"
         className="button primary"
-        disabled={disabled}
+        disabled={disabled || !edits.length}
       >
-        Apply as new version
+        Save reviewed edit
         <ArrowRight size={15} />
       </button>
       <p className="micro">

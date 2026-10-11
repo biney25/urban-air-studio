@@ -1,0 +1,755 @@
+[
+  {
+    "name": "annotated-types",
+    "version": "0.8.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/annotated-types/licenses/LICENSE",
+        "sha256": "fe1049884b1a0d9342901e88e07f32925d24b3121d9972b6a6805fb9824b095d"
+      }
+    ]
+  },
+  {
+    "name": "anyio",
+    "version": "4.15.1",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/anyio/licenses/LICENSE",
+        "sha256": "5361ac9dc58f2ef5fd2e9b09c68297c17f04950909bbc8023bdb82eacf22c2b0"
+      }
+    ]
+  },
+  {
+    "name": "attrs",
+    "version": "26.1.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/attrs/licenses/LICENSE",
+        "sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f"
+      }
+    ]
+  },
+  {
+    "name": "boto3",
+    "version": "1.43.111",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/boto3/LICENSE",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      },
+      {
+        "path": "third_party/assistant/boto3/NOTICE",
+        "sha256": "04fb1e61484a7810f1ba09bb42bc01ca58c9af33927d7c5a21556e4c4d1c7fa4"
+      }
+    ]
+  },
+  {
+    "name": "botocore",
+    "version": "1.43.111",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/botocore/LICENSE.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      },
+      {
+        "path": "third_party/assistant/botocore/NOTICE",
+        "sha256": "1d1c5a6f3d68cb11f4fad1afa86a7450d0286f15c176ef0ea048f255b46d95b0"
+      }
+    ]
+  },
+  {
+    "name": "certifi",
+    "version": "2026.7.22",
+    "license": "MPL-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/certifi/licenses/LICENSE",
+        "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+      }
+    ]
+  },
+  {
+    "name": "cffi",
+    "version": "2.1.1",
+    "license": "MIT-0",
+    "files": [
+      {
+        "path": "third_party/assistant/cffi/licenses/LICENSE",
+        "sha256": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63"
+      }
+    ]
+  },
+  {
+    "name": "click",
+    "version": "8.5.0",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/click/licenses/LICENSE.txt",
+        "sha256": "9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d"
+      }
+    ]
+  },
+  {
+    "name": "cryptography",
+    "version": "50.0.2",
+    "license": "Apache-2.0 OR BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/cryptography/licenses/LICENSE",
+        "sha256": "3e0c7c091a948b82533ba98fd7cbb40432d6f1a9acbf85f5922d2f99a93ae6bb"
+      },
+      {
+        "path": "third_party/assistant/cryptography/licenses/LICENSE.APACHE",
+        "sha256": "aac73b3148f6d1d7111dbca32099f68d26c644c6813ae1e4f05f6579aa2663fe"
+      },
+      {
+        "path": "third_party/assistant/cryptography/licenses/LICENSE.BSD",
+        "sha256": "602c4c7482de6479dd2e9793cda275e5e63d773dacd1eca689232ab7008fb4fb"
+      }
+    ]
+  },
+  {
+    "name": "docstring_parser",
+    "version": "0.18.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/docstring_parser/licenses/LICENSE.md",
+        "sha256": "dfe514a337ae8417abd31a8af707bbd6172b03e5430bb083e145899ea97a3eea"
+      }
+    ]
+  },
+  {
+    "name": "h11",
+    "version": "0.16.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/h11/licenses/LICENSE.txt",
+        "sha256": "37db5bb85926db28a427a25867f10b1232003aea1be69ccb851138adb8e6f361"
+      }
+    ]
+  },
+  {
+    "name": "httpcore",
+    "version": "1.0.9",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/httpcore/licenses/LICENSE.md",
+        "sha256": "fdcb59154c74cbaba16a11242f7740bea9f23d6feb5547917d8c5f94a80392a5"
+      }
+    ]
+  },
+  {
+    "name": "httpcore2",
+    "version": "2.13.1",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/httpcore2/licenses/LICENSE.md",
+        "sha256": "c4df125c807b0613501e943a5c92496dd11d2c16604ce396097a8dde396304d9"
+      }
+    ]
+  },
+  {
+    "name": "httpx",
+    "version": "0.28.1",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/httpx/licenses/LICENSE.md",
+        "sha256": "4ec59d544f12b5f539a3a716fd321ac58ccd8030b465221f2c880200cdf28d8d"
+      }
+    ]
+  },
+  {
+    "name": "httpx2",
+    "version": "2.13.1",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/httpx2/licenses/LICENSE.md",
+        "sha256": "7e7d6dbaf7fe160d39fd6e84fd02c33cab96bcbea34d36998d545bceb4a19c30"
+      }
+    ]
+  },
+  {
+    "name": "idna",
+    "version": "3.20",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/idna/licenses/LICENSE.md",
+        "sha256": "1a9a4f0e3d479a27240ddd59a9137a66ab4a0f9dfdc8ca6188cc0bfd85187f04"
+      }
+    ]
+  },
+  {
+    "name": "jmespath",
+    "version": "1.1.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/jmespath/LICENSE",
+        "sha256": "6eefacfa4d71b82d08408c751470ac8d9854538da2142cb27be0287fb13d0ab9"
+      }
+    ]
+  },
+  {
+    "name": "jsonschema",
+    "version": "4.26.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/jsonschema/licenses/COPYING",
+        "sha256": "4f92a015a13c4d1a040bef018aa13430b4f1bc73b41b16bb846c346766de7439"
+      }
+    ]
+  },
+  {
+    "name": "jsonschema-specifications",
+    "version": "2025.9.1",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/jsonschema-specifications/licenses/COPYING",
+        "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
+      }
+    ]
+  },
+  {
+    "name": "mcp",
+    "version": "2.1.1",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/mcp/licenses/LICENSE",
+        "sha256": "5e13dbbc1d120fc2a03cecde7c91424ae2d7de11b63d58ded2f4431e261ee50d"
+      }
+    ]
+  },
+  {
+    "name": "mcp-types",
+    "version": "2.1.1",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/mcp-types/licenses/LICENSE",
+        "sha256": "5e13dbbc1d120fc2a03cecde7c91424ae2d7de11b63d58ded2f4431e261ee50d"
+      }
+    ]
+  },
+  {
+    "name": "ollama",
+    "version": "0.6.3",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/ollama/licenses/LICENSE",
+        "sha256": "5934ed2ce0d15154bcdb9c85203210abac0da4314af34081e36df4599f90b226"
+      }
+    ]
+  },
+  {
+    "name": "opentelemetry-api",
+    "version": "1.45.1",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/opentelemetry-api/licenses/LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ]
+  },
+  {
+    "name": "opentelemetry-instrumentation",
+    "version": "0.66b1",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/opentelemetry-instrumentation/licenses/LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ]
+  },
+  {
+    "name": "opentelemetry-instrumentation-threading",
+    "version": "0.66b1",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/opentelemetry-instrumentation-threading/licenses/LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ]
+  },
+  {
+    "name": "opentelemetry-sdk",
+    "version": "1.45.1",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/opentelemetry-sdk/licenses/LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ]
+  },
+  {
+    "name": "opentelemetry-semantic-conventions",
+    "version": "0.66b1",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/opentelemetry-semantic-conventions/licenses/LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    ]
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "license": "Apache-2.0 OR BSD-2-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/packaging/licenses/LICENSE",
+        "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+      },
+      {
+        "path": "third_party/assistant/packaging/licenses/LICENSE.APACHE",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      },
+      {
+        "path": "third_party/assistant/packaging/licenses/LICENSE.BSD",
+        "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+      }
+    ]
+  },
+  {
+    "name": "pip",
+    "version": "25.2",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/pip/licenses/AUTHORS.txt",
+        "sha256": "8a811f3069248b37137083ddbe387e918ca63b513d23d76fcc78cb525292e66f"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/LICENSE.txt",
+        "sha256": "634300a669d49aeae65b12c6c48c924c51a4cdf3d1ff086dc3456dc8bcaa2104"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/cachecontrol/LICENSE.txt",
+        "sha256": "86eeee87be2a43f3ff1f56496f451f69243926f025fedbb033666c304c4c161b"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/certifi/LICENSE",
+        "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/dependency_groups/LICENSE.txt",
+        "sha256": "1ab36e3e2a4ba8631625384f87e9e091db1faed034c5b23325b3239abf2cc525"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/distlib/LICENSE.txt",
+        "sha256": "808e10c8a6ab8deb149ff9b3fb19f447a808094606d712a9ca57fead3552599d"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/distro/LICENSE",
+        "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/idna/LICENSE.md",
+        "sha256": "a59f0b0ef3635874109a4461ca44ff7a70d50696e814767bfaf721d4c9b0db0f"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/msgpack/COPYING",
+        "sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/packaging/LICENSE",
+        "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/packaging/LICENSE.APACHE",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/packaging/LICENSE.BSD",
+        "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/pkg_resources/LICENSE",
+        "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/platformdirs/LICENSE",
+        "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/pygments/LICENSE",
+        "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/pyproject_hooks/LICENSE",
+        "sha256": "1b22b049b5267d6dfc23a67bf4a84d8ec04b9fdfb1a51d360e42b4342c8b4154"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/requests/LICENSE",
+        "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/resolvelib/LICENSE",
+        "sha256": "f388fd38cad13112c1dc0f669bbe80e7f84541edbafb72f3030d2ca7642c3c9d"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/rich/LICENSE",
+        "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/tomli/LICENSE",
+        "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/tomli/LICENSE-HEADER",
+        "sha256": "97ce9330905a172dde870ee0361d89beb95ba3bd0f4545796aa91a8c01a43531"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/tomli_w/LICENSE",
+        "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/truststore/LICENSE",
+        "sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+      },
+      {
+        "path": "third_party/assistant/pip/licenses/src/pip/_vendor/urllib3/LICENSE.txt",
+        "sha256": "c37bf186e27cf9dbe9619e55edfe3cea7b30091ceb3da63c7dacbe0e6d77907b"
+      }
+    ]
+  },
+  {
+    "name": "pycparser",
+    "version": "3.11",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/pycparser/licenses/LICENSE",
+        "sha256": "0a9e78156ae8b96caf1b4f11ac2df424b83de29736f9e757630548a6272fdf90"
+      }
+    ]
+  },
+  {
+    "name": "pydantic",
+    "version": "2.14.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/pydantic/licenses/LICENSE",
+        "sha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3"
+      }
+    ]
+  },
+  {
+    "name": "pydantic_core",
+    "version": "2.50.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/pydantic_core/licenses/LICENSE",
+        "sha256": "fbe7f615f18d135c07000e5a86325db27f42c7729699ef166ac1f7a3f4586bf4"
+      }
+    ]
+  },
+  {
+    "name": "PyJWT",
+    "version": "2.15.1",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/PyJWT/licenses/AUTHORS.rst",
+        "sha256": "925ce43461029eedbf558ec0b7cf7fc4b045def5120ebb97937c70814071cf07"
+      },
+      {
+        "path": "third_party/assistant/PyJWT/licenses/LICENSE",
+        "sha256": "797a7a20231d4c433e9f1911db1731d06b5828b98f499819a034f7c0f56f5ce5"
+      }
+    ]
+  },
+  {
+    "name": "python-dateutil",
+    "version": "2.9.0.post0",
+    "license": "Dual License",
+    "files": [
+      {
+        "path": "third_party/assistant/python-dateutil/LICENSE",
+        "sha256": "ba00f51a0d92823b5a1cde27d8b5b9d2321e67ed8da9bc163eff96d5e17e577e"
+      }
+    ]
+  },
+  {
+    "name": "python-multipart",
+    "version": "0.0.32",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/python-multipart/licenses/LICENSE.txt",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      }
+    ]
+  },
+  {
+    "name": "pywin32",
+    "version": "312",
+    "license": "PSF",
+    "files": [
+      {
+        "path": "third_party/assistant/pywin32/adodbapi/license.txt",
+        "sha256": "5ea2f23c7f00c3006bacf267183e816d8d4b6dc95ea57a4ddb0ff81de6d8719e"
+      },
+      {
+        "path": "third_party/assistant/pywin32/pythonwin/License.txt",
+        "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+      },
+      {
+        "path": "third_party/assistant/pywin32/pythonwin/pywin/idle/LICENSE.txt",
+        "sha256": "a0fa1e7b8a4230055685e796548ac084a6c0eea395294574093bba72efd9191b"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/adodbapi/license.txt",
+        "sha256": "5ea2f23c7f00c3006bacf267183e816d8d4b6dc95ea57a4ddb0ff81de6d8719e"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/com/License.txt",
+        "sha256": "fad39c18fc3825fa278db1c86fd52cf88d7c525b3c2fbf7817fa383cbae4d423"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/com/win32comext/mapi/src/MAPIStubLibrary/LICENSE",
+        "sha256": "1c4cf44d2fb8bf2d10214d6da80cc9e05502824cc4460f35be4c7bcb4cde53da"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/isapi/README.txt",
+        "sha256": "41383bcc95edb8138d37077ae54bfdcbd2a3b77bf745a8529a9c161146e22303"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/pythonwin/License.txt",
+        "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/pythonwin/Scintilla/License.txt",
+        "sha256": "57ec79bbeab4fd1cf7460a7ad450d2ab01471810459aeae9e75e4c66b472095f"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/pythonwin/pywin/idle/LICENSE.txt",
+        "sha256": "a0fa1e7b8a4230055685e796548ac084a6c0eea395294574093bba72efd9191b"
+      },
+      {
+        "path": "third_party/assistant/pywin32/licenses/win32/License.txt",
+        "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+      },
+      {
+        "path": "third_party/assistant/pywin32/win32/License.txt",
+        "sha256": "a74d826efb242db087b850348e20abbfd591b51e2081f2048735290913872924"
+      },
+      {
+        "path": "third_party/assistant/pywin32/win32com/License.txt",
+        "sha256": "fad39c18fc3825fa278db1c86fd52cf88d7c525b3c2fbf7817fa383cbae4d423"
+      },
+      {
+        "path": "third_party/assistant/pywin32/win32comext/License.txt",
+        "sha256": "fad39c18fc3825fa278db1c86fd52cf88d7c525b3c2fbf7817fa383cbae4d423"
+      },
+      {
+        "path": "third_party/assistant/pywin32/win32comext/mapi/NOTICE.md",
+        "sha256": "dedf997c8f5568a0e0aff57d009f501226ea30c401323d67912b6a8f8735a825"
+      }
+    ]
+  },
+  {
+    "name": "PyYAML",
+    "version": "6.0.3",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/PyYAML/licenses/LICENSE",
+        "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4"
+      }
+    ]
+  },
+  {
+    "name": "referencing",
+    "version": "0.37.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/referencing/licenses/COPYING",
+        "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
+      }
+    ]
+  },
+  {
+    "name": "rpds-py",
+    "version": "2026.9.1",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/rpds-py/licenses/LICENSE",
+        "sha256": "8bcb72c82ea8ae74802293c41d93ad7d51434001b0ae45a603a5af0f507aee0a"
+      }
+    ]
+  },
+  {
+    "name": "s3transfer",
+    "version": "0.19.2",
+    "license": "Apache License 2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/s3transfer/LICENSE.txt",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "path": "third_party/assistant/s3transfer/NOTICE.txt",
+        "sha256": "d8354e0fa7fb762da7bc054a8a6774a0b310dfbbc78006393ee573a0e57612b5"
+      }
+    ]
+  },
+  {
+    "name": "six",
+    "version": "1.17.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/six/LICENSE",
+        "sha256": "4375ba20e2b9c6c4e7cad2940a628fd90e95cc3d50ee92aae755715d8ba1fbd0"
+      }
+    ]
+  },
+  {
+    "name": "sse-starlette",
+    "version": "3.5.0",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/sse-starlette/licenses/AUTHORS",
+        "sha256": "c2ff63d2ecf128bbda8ab1b2016830a5da124202fbb97168685bb9946aed3f1a"
+      },
+      {
+        "path": "third_party/assistant/sse-starlette/licenses/LICENSE",
+        "sha256": "80af6bfccbebd2c14d4aab96695cab9950e177190cc80f5ef819e99996883e8e"
+      }
+    ]
+  },
+  {
+    "name": "starlette",
+    "version": "1.7.0",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/starlette/licenses/LICENSE.md",
+        "sha256": "dcb95677a02240243187e964f941847d19b17821cf99e5afae684fab328c19bf"
+      }
+    ]
+  },
+  {
+    "name": "strands-agents",
+    "version": "1.59.0",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/strands-agents/licenses/LICENSE",
+        "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+      },
+      {
+        "path": "third_party/assistant/strands-agents/licenses/NOTICE",
+        "sha256": "120d77a203a6708ec9a4c8f19e2167286f35bf05375fc5fb3ff225a6f560e515"
+      }
+    ]
+  },
+  {
+    "name": "truststore",
+    "version": "0.10.4",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/truststore/licenses/LICENSE",
+        "sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+      }
+    ]
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "license": "PSF-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/typing_extensions/licenses/LICENSE",
+        "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+      }
+    ]
+  },
+  {
+    "name": "typing-inspection",
+    "version": "0.4.4",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/typing-inspection/licenses/LICENSE",
+        "sha256": "804b59b25f2c31bd278f9202a19ae49a3945aa2664387e2d0a128c7cacc61ec3"
+      }
+    ]
+  },
+  {
+    "name": "urllib3",
+    "version": "2.8.0",
+    "license": "MIT",
+    "files": [
+      {
+        "path": "third_party/assistant/urllib3/licenses/LICENSE.txt",
+        "sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686"
+      }
+    ]
+  },
+  {
+    "name": "uvicorn",
+    "version": "0.54.0",
+    "license": "BSD-3-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/uvicorn/licenses/LICENSE.md",
+        "sha256": "efe1acf3e62fb99c288b0ec73e5a773b7268ef4320fe757ea994214e4b63c371"
+      }
+    ]
+  },
+  {
+    "name": "watchdog",
+    "version": "6.0.0",
+    "license": "Apache-2.0",
+    "files": [
+      {
+        "path": "third_party/assistant/watchdog/COPYING",
+        "sha256": "39f081828db6f94c70123fa4fb30c1bce3e215a8fdece53a49991fe076a69c08"
+      },
+      {
+        "path": "third_party/assistant/watchdog/LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      }
+    ]
+  },
+  {
+    "name": "wrapt",
+    "version": "2.5.0",
+    "license": "BSD-2-Clause",
+    "files": [
+      {
+        "path": "third_party/assistant/wrapt/licenses/LICENSE",
+        "sha256": "fc5afb82933ac1843af562dc343792687e8a513058aaaffb75d8aba5492a7050"
+      }
+    ]
+  }
+]

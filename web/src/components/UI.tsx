@@ -3,11 +3,10 @@ import {
   ArrowRight,
   Check,
   ChevronRight,
-  Download,
   LoaderCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { ApiError, downloadJson } from "../api";
+import { ApiError } from "../api";
 export function Badge({
   children,
   tone = "quiet",
@@ -120,13 +119,21 @@ export function EvidenceNote({
       <div>
         <strong>
           {synthetic
-            ? "Synthetic input geometry"
+            ? "Fictional sample geometry"
             : `Imported input geometry${illustrative ? " · illustrative assumptions" : ""}`}
         </strong>
         <span>
-          T1 research preview. No measured air-quality observations or site
-          validation. Default mesh is not convergence-qualified; small differences can be numerical or native-cell sampling effects.
+          Research inputs · no measured air-quality observations or site
+          validation.
         </span>
+        <details>
+          <summary>Model suitability</summary>
+          <p>
+            T1 research preview. Default mesh is not convergence-qualified;
+            small differences can be numerical or native-cell sampling effects.
+            Use this to investigate, not approve a design.
+          </p>
+        </details>
       </div>
     </div>
   );
@@ -142,18 +149,9 @@ export function JsonViewer({
     <details className="json-viewer">
       <summary>
         {title}
-        <Download size={14} />
+        <ChevronRight size={14} />
       </summary>
       <pre>{JSON.stringify(data, null, 2)}</pre>
-      <button
-        className="button small"
-        onClick={() =>
-          downloadJson(`${title.toLowerCase().replaceAll(" ", "-")}.json`, data)
-        }
-      >
-        <Download size={14} />
-        Download JSON
-      </button>
     </details>
   );
 }
