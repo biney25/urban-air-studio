@@ -143,7 +143,8 @@ class PostgresStore(Store):
     def migrate(self):
         with self.transaction() as db:
             # Checked-in migration contains no runtime/user interpolation.
-            db.connection.execute(MIGRATION.read_text(encoding="utf-8"), prepare=False)
+            sql_path = MIGRATION if MIGRATION.is_file() else (Path(__file__).resolve().parent / "app-v1.sql")
+            db.connection.execute(sql_path.read_text(encoding="utf-8"), prepare=False)
 
     def spatial_objects(self, tenant, project, scenario_id, bounds, limit=200):
         """Bounded, tenant/version-scoped physical-local spatial lookup.

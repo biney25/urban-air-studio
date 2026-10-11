@@ -20,7 +20,7 @@ COPY datasets ./datasets
 COPY evidence ./evidence
 COPY third_party ./third_party
 COPY contracts ./contracts
-COPY infra/public_demo.py ./infra/public_demo.py
+COPY infra ./infra
 COPY --from=web /build/web/dist ./web/dist
 USER 10001
 EXPOSE 10000

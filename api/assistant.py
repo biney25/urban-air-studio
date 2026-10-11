@@ -29,17 +29,14 @@ GEMINI_FUNCTION_DECLARATIONS = [
     {
         "name": "inspect_study",
         "description": "Inspect the selected study's saved designs, run statuses and missing-baseline blockers.",
-        "parameters": {"type": "OBJECT", "properties": {}},
     },
     {
         "name": "read_geometry",
         "description": "Read selected snapshot building/source IDs and parameters before proposing changes.",
-        "parameters": {"type": "OBJECT", "properties": {}},
     },
     {
         "name": "read_comparison",
         "description": "Read exact matched selected baseline/alternative research-run metrics and limitations.",
-        "parameters": {"type": "OBJECT", "properties": {}},
     },
     {
         "name": "propose_change",
@@ -122,7 +119,6 @@ class GeminiModel:
                 "systemInstruction": {"parts": [{"text": system_prompt}]},
                 "contents": contents,
                 "tools": [{"functionDeclarations": GEMINI_FUNCTION_DECLARATIONS}],
-                "toolConfig": {"functionCallingConfig": {"mode": "AUTO"}},
                 "generationConfig": {"temperature": 0.0, "maxOutputTokens": 600},
             }
 
@@ -135,6 +131,9 @@ class GeminiModel:
             try:
                 with urllib.request.urlopen(req, timeout=min(30, max(2, deadline - time.monotonic()))) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
+            except urllib.error.HTTPError as exc:
+                err_detail = exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else str(exc)
+                raise LocalModelUnavailable(f"GEMINI_HTTP_{exc.code}: {err_detail[:300]}")
             except Exception as exc:
                 raise LocalModelUnavailable(f"GEMINI_CALL_FAILED: {exc}")
 
@@ -341,8 +340,8 @@ def make_router(*, identity_dependency, store_dependency, required, project_reso
                     state, answer = "complete", result["answer"]
                 else:
                     state, answer = "blocked", "The model response did not pass evidence checks. Review the authoritative tool evidence below."
-            except (LocalModelUnavailable, OSError, ValueError):
-                state, answer = "unavailable", "The local model could not finish within its limits. Any displayed tool evidence is retained; no edit was applied."
+            except (LocalModelUnavailable, OSError, ValueError) as exc:
+                state, answer = "unavailable", f"The assistant could not finish: {exc}. Any displayed tool evidence is retained; no edit was applied."
             finally:
                 _GATE.release()
         reply = {"id": new_id("areply"), "session_id": selected["id"], "status": state, "answer": answer,

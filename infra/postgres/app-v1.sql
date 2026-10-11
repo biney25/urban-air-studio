@@ -1,6 +1,10 @@
 -- Explicit application migration, separate from bootstrapping the PostGIS extension.
 -- Requires CREATE in database/schema during migration, not for the serving role.
-CREATE EXTENSION IF NOT EXISTS postgis;
+DO $$ BEGIN
+    CREATE EXTENSION IF NOT EXISTS postgis;
+EXCEPTION WHEN OTHERS THEN
+    NULL;
+END; $$;
 CREATE SCHEMA IF NOT EXISTS urban;
 CREATE TABLE IF NOT EXISTS urban.schema_versions (
     version TEXT PRIMARY KEY, installed_at TIMESTAMPTZ NOT NULL DEFAULT now()
