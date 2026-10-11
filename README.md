@@ -151,7 +151,9 @@ Imported measurement/prediction declarations do not attest scientific validity.
 PhoenixFires roster: Shaurya Goyal (event leader), Shrivats Goel, Tushar Aggarwal
 ([biney25](https://github.com/biney25)), Muskan Pandey. Only biney25 is currently
 confirmed as a GitHub account; event usernames are not treated as GitHub handles.
-Each person's actual deliverables still need their confirmation in the submission.
+The owner confirmed early ideation contributions from Shaurya, Shrivats and Muskan;
+Tushar directed product scope and reviewed AI-assisted implementation, integration,
+deployment and submission materials.
 
 OpenAI Codex/ChatGPT coding assistance and focused frontend/platform/science
 subagents were used for implementation, research and testing. Google Gemini /
@@ -174,8 +176,7 @@ snapshot was published with the owner's approval at
 [biney25/urban-air-studio](https://github.com/biney25/urban-air-studio). There was no
 working-folder Git history at the first compliance review; subsequent private
 commits and public increments retain their actual dates. Checkpoints supplement
-provenance without recreating missing history. This new candidate is unpublished
-until its exact audit and owner approval are complete. Private development data
+provenance without recreating missing history. The audited source is public with the owner's approval. Private development data
 and original product reference documents remain local.
 
 ## Free public demonstration
@@ -183,3 +184,9 @@ and original product reference documents remain local.
 Live demo: https://urban-air-studio.onrender.com
 
 Render Free hosting runs the frontend, API, real Cedar and bounded T1 worker with isolated anonymous browser sessions. Its data is temporary and resets on sleep/restart. Native OpenFOAM and local AI remain in the local edition. See [deployment and limitations](docs/free-public-deployment.md).
+
+Final live checks verified project isolation, import/edit/run/compare/report,
+unexecuted OpenFOAM case ZIP generation and one Gemini model-selected study
+inspection with an evidence-backed answer. This single assistant task does not
+complete the wider evaluation. PostgreSQL/Supabase is currently unavailable;
+public data, session access and artifacts remain temporary.
