@@ -201,8 +201,29 @@ def test_gemini_model_infer_404_candidate_fallback(monkeypatch):
     assert res["type"] == "answer"
     assert len(attempts) >= 2
     assert "non-existent-model" in attempts[0]
-    assert "gemini-2.0-flash" in attempts[1]
-    assert model.model_id == "gemini-2.0-flash"
+    assert "gemini-3.5-flash-lite" in attempts[1]
+    assert model.model_id == "gemini-3.5-flash-lite"
+
+
+def test_long_lived_runtime_adopts_model_discovered_by_status(monkeypatch):
+    import api.assistant as assistant_mod
+    runtime = GeminiModel(api_key="test-api-key")
+    monkeypatch.setattr(assistant_mod, "_DISCOVERED_MODEL", "gemini-3.5-flash-lite")
+    def respond(req, **kwargs):
+        assert "gemini-3.5-flash-lite:generateContent" in req.full_url
+        return MockResponse({"candidates": [{"content": {"parts": [{"text": "Review the study evidence."}]}}]})
+    monkeypatch.setattr(urllib.request, "urlopen", respond)
+    runtime.infer("Inspect study", [], DummyTools())
+    assert runtime.model_dict["model_id"] == "gemini-3.5-flash-lite"
+
+
+def test_discovery_prefers_current_free_text_model(monkeypatch):
+    import api.assistant as assistant_mod
+    monkeypatch.setattr(assistant_mod, "_DISCOVERED_MODEL", None)
+    names = ["gemini-2.5-flash", "gemini-3.8-flash-image", "gemini-3.5-flash-lite"]
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *args, **kwargs: MockResponse({
+        "models": [{"name": "models/" + name, "supportedGenerationMethods": ["generateContent"]} for name in names]}))
+    assert assistant_mod.discover_gemini_model("test-api-key") == "gemini-3.5-flash-lite"
 
 
 def test_gemini_truncated_response_is_not_complete(monkeypatch):

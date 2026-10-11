@@ -57,12 +57,12 @@ GEMINI_FUNCTION_DECLARATIONS = [
 
 _DISCOVERED_MODEL = None
 _CANDIDATE_MODELS = [
-    "gemini-2.0-flash",
-    "gemini-1.5-flash-latest",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+    "gemini-3.8-flash",
+    "gemini-2.5-flash-lite",
     "gemini-2.5-flash",
-    "gemini-1.5-flash-8b",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
+    "gemini-2.0-flash",
 ]
 
 
@@ -86,22 +86,12 @@ def discover_gemini_model(api_key: str) -> str:
             if "generateContent" in m.get("supportedGenerationMethods", [])
         ]
         chosen = None
-        for m in valid_models:
-            if "flash" in m and "preview" not in m and "experimental" not in m:
+        # Prefer supported text models with a documented free tier; listing order
+        # can put inaccessible legacy models or specialised models first.
+        for m in _CANDIDATE_MODELS:
+            if m in valid_models:
                 chosen = m
                 break
-        if not chosen:
-            for m in valid_models:
-                if "flash" in m:
-                    chosen = m
-                    break
-        if not chosen:
-            for m in valid_models:
-                if "gemini" in m:
-                    chosen = m
-                    break
-        if not chosen and valid_models:
-            chosen = valid_models[0]
 
         if chosen:
             _DISCOVERED_MODEL = chosen
@@ -109,7 +99,7 @@ def discover_gemini_model(api_key: str) -> str:
     except Exception as exc:
         logging.getLogger(__name__).warning("Gemini model discovery failed (%s)", type(exc).__name__)
 
-    return "gemini-2.0-flash"
+    return _CANDIDATE_MODELS[0]
 
 
 class GeminiModel:
@@ -123,7 +113,7 @@ class GeminiModel:
 
     def status(self):
         ready = bool(self.api_key)
-        if ready and not self.explicit_model and not os.getenv("GEMINI_MODEL") and not _DISCOVERED_MODEL:
+        if ready and not self.explicit_model and not os.getenv("GEMINI_MODEL"):
             discovered = discover_gemini_model(self.api_key)
             self.model_id = discovered
             self.model_dict["model_id"] = discovered
@@ -151,7 +141,7 @@ class GeminiModel:
         if not self.api_key:
             raise LocalModelUnavailable("GEMINI_API_KEY_MISSING")
 
-        if not self.explicit_model and not os.getenv("GEMINI_MODEL") and not _DISCOVERED_MODEL:
+        if not self.explicit_model and not os.getenv("GEMINI_MODEL"):
             discovered = discover_gemini_model(self.api_key)
             self.model_id = discovered
             self.model_dict["model_id"] = discovered
