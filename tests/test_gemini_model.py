@@ -133,3 +133,63 @@ def test_gemini_model_network_failure(monkeypatch):
     monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
     with pytest.raises(LocalModelUnavailable, match="GEMINI_CALL_FAILED"):
         model.infer("Hello", [], tools)
+
+
+def test_gemini_model_discovery(monkeypatch):
+    import api.assistant as assistant_mod
+    monkeypatch.setattr(assistant_mod, "_DISCOVERED_MODEL", None)
+
+    def mock_urlopen(req, timeout=10):
+        assert "models?key=test-api-key" in req.full_url
+        return MockResponse({
+            "models": [
+                {
+                    "name": "models/gemini-pro",
+                    "supportedGenerationMethods": ["generateContent"]
+                },
+                {
+                    "name": "models/gemini-2.0-flash",
+                    "supportedGenerationMethods": ["generateContent"]
+                }
+            ]
+        })
+
+    monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
+    model_name = assistant_mod.discover_gemini_model("test-api-key")
+    assert model_name == "gemini-2.0-flash"
+
+
+def test_gemini_model_infer_404_candidate_fallback(monkeypatch):
+    import api.assistant as assistant_mod
+    monkeypatch.setattr(assistant_mod, "_DISCOVERED_MODEL", None)
+    tools = DummyTools()
+    model = GeminiModel(api_key="test-api-key", model_id="non-existent-model")
+
+    attempts = []
+
+    def mock_urlopen(req, timeout=30):
+        attempts.append(req.full_url)
+        if "non-existent-model" in req.full_url:
+            fp = io.BytesIO(b'{"error":{"code":404,"message":"Model not found"}}')
+            raise urllib.error.HTTPError(req.full_url, 404, "Not Found", {}, fp)
+        # Fallback candidate succeeds
+        return MockResponse({
+            "candidates": [{
+                "content": {
+                    "role": "model",
+                    "parts": [{
+                        "text": "The selected study has been inspected. Review its saved design status and blockers in the evidence cards below."
+                    }]
+                }
+            }],
+            "usageMetadata": {"promptTokenCount": 50, "candidatesTokenCount": 20}
+        })
+
+    monkeypatch.setattr(urllib.request, "urlopen", mock_urlopen)
+    res = model.infer("Check status", [], tools)
+    assert res["type"] == "answer"
+    assert len(attempts) >= 2
+    assert "non-existent-model" in attempts[0]
+    assert "gemini-2.0-flash" in attempts[1]
+    assert model.model_id == "gemini-2.0-flash"
+

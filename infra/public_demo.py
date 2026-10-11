@@ -103,6 +103,7 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
                 raise OSError("Public demo artifact storage allowance reached")
             return super().atomic_artifact(run_id, fence, payload)
 
+    storage_error = None
     database_url = os.getenv("UA_DATABASE_URL") or os.getenv("DATABASE_URL")
     if database_url and database_url.startswith(("postgresql://", "postgres://")):
         try:
@@ -115,6 +116,7 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
                     return super().atomic_artifact(run_id, fence, payload)
             store = DemoPostgresStore(directory, database_url=database_url, auto_migrate=True)
         except Exception as exc:
+            storage_error = str(exc)
             logging.getLogger(__name__).warning("DemoPostgresStore fallback: %s", exc)
             store = DemoStore(directory)
     else:
@@ -122,6 +124,7 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
     app = api_app(directory)
     app.state.store = store
     app.state.demo_limits = limits
+    app.state.storage_error = storage_error
     app.dependency_overrides[get_store] = lambda: store
 
     def demo_identity(request: Request):
@@ -343,7 +346,7 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
         from science import MODEL_VERSION
         gemini_ready = bool(os.getenv("GEMINI_API_KEY"))
         storage_kind = getattr(store, "adapter_name", "ephemeral_demo_sqlite")
-        return {"phase": "Isolated public research demo", "model_version": MODEL_VERSION,
+        payload = {"phase": "Isolated public research demo", "model_version": MODEL_VERSION,
             "supported_tiers": ["T0", "T1"], "capability_statuses": {"T0": "implemented_geometry_diagnostics", "T1": "research_preview_unvalidated", "T2": "not_hosted_on_free_demo"},
             "species": ["passive_tracer"], "imports": ["GeoJSON Polygon/Point"], "identity": "anonymous_browser_session",
             "storage": storage_kind, "operator_views_available": False, "ai_available": gemini_ready,
@@ -351,6 +354,9 @@ def create_app(directory=None, dist=None, *, demo_origin=None, limits=None, star
             "cloud_deployed": False, "validated": False,
             "geographic_context": {"map_navigation": "Supported worldwide coordinates", "providers": ["OSM geometry", "Open-Meteo GFS weather context"], "semantic_preparation": "review_required", "national_scientific_coverage": False},
             "limitations": ["Ephemeral anonymous demo; no accounts or production cloud assurance", "T1 research previews are scientifically unvalidated", "Native CFD is not hosted; case download available"]}
+        if getattr(app.state, "storage_error", None):
+            payload["storage_error"] = app.state.storage_error
+        return payload
 
     @app.get("/api/projects/{project_id}/assistant/status")
     def assistant_status(project_id: str, identity=Depends(demo_identity)):

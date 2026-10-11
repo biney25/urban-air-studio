@@ -1,5 +1,6 @@
 """Bounded actual local Strands assistant; domain tools remain server-authoritative."""
 import json
+import logging
 import os
 from pathlib import Path
 import queue
@@ -54,16 +55,78 @@ GEMINI_FUNCTION_DECLARATIONS = [
 ]
 
 
+_DISCOVERED_MODEL = None
+_CANDIDATE_MODELS = [
+    "gemini-2.0-flash",
+    "gemini-1.5-flash-latest",
+    "gemini-2.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+]
+
+
+def discover_gemini_model(api_key: str) -> str:
+    global _DISCOVERED_MODEL
+    if os.getenv("GEMINI_MODEL"):
+        return os.environ["GEMINI_MODEL"]
+    if _DISCOVERED_MODEL:
+        return _DISCOVERED_MODEL
+    if not api_key:
+        return "gemini-2.0-flash"
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
+        req = urllib.request.Request(url, headers={"Content-Type": "application/json"}, method="GET")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        models = data.get("models", [])
+        valid_models = [
+            m["name"].removeprefix("models/")
+            for m in models
+            if "generateContent" in m.get("supportedGenerationMethods", [])
+        ]
+        chosen = None
+        for m in valid_models:
+            if "flash" in m and "preview" not in m and "experimental" not in m:
+                chosen = m
+                break
+        if not chosen:
+            for m in valid_models:
+                if "flash" in m:
+                    chosen = m
+                    break
+        if not chosen:
+            for m in valid_models:
+                if "gemini" in m:
+                    chosen = m
+                    break
+        if not chosen and valid_models:
+            chosen = valid_models[0]
+
+        if chosen:
+            _DISCOVERED_MODEL = chosen
+            return chosen
+    except Exception as exc:
+        logging.getLogger(__name__).warning("Gemini model discovery error: %s", exc)
+
+    return "gemini-2.0-flash"
+
+
 class GeminiModel:
     prompt_version = "study-assistant-gemini-20261011"
 
     def __init__(self, api_key=None, model_id=None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
-        self.model_id = model_id or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        self.explicit_model = bool(model_id)
+        self.model_id = model_id or os.getenv("GEMINI_MODEL") or _DISCOVERED_MODEL or "gemini-2.0-flash"
         self.model_dict = {"provider": "gemini", "model_id": self.model_id}
 
     def status(self):
         ready = bool(self.api_key)
+        if ready and not self.explicit_model and not os.getenv("GEMINI_MODEL") and not _DISCOVERED_MODEL:
+            discovered = discover_gemini_model(self.api_key)
+            self.model_id = discovered
+            self.model_dict["model_id"] = discovered
         busy = ready and _GATE.locked()
         evaluation = {
             "actual_inference_gate": "passed" if ready else "unavailable",
@@ -84,8 +147,14 @@ class GeminiModel:
         }
 
     def infer(self, message, history, tools, timeout=60):
+        global _DISCOVERED_MODEL
         if not self.api_key:
             raise LocalModelUnavailable("GEMINI_API_KEY_MISSING")
+
+        if not self.explicit_model and not os.getenv("GEMINI_MODEL") and not _DISCOVERED_MODEL:
+            discovered = discover_gemini_model(self.api_key)
+            self.model_id = discovered
+            self.model_dict["model_id"] = discovered
 
         system_prompt = (
             "You are the Study assistant for one selected Urban Air Studio study. "
@@ -107,7 +176,6 @@ class GeminiModel:
             contents.append({"role": "model", "parts": [{"text": "Understood. I will use the available study tools to investigate."}]})
         contents.append({"role": "user", "parts": [{"text": message}]})
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_id}:generateContent?key={self.api_key}"
         total_usage = {}
         deadline = time.monotonic() + timeout
 
@@ -122,20 +190,41 @@ class GeminiModel:
                 "generationConfig": {"temperature": 0.0, "maxOutputTokens": 600},
             }
 
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(body).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            try:
-                with urllib.request.urlopen(req, timeout=min(30, max(2, deadline - time.monotonic()))) as resp:
-                    data = json.loads(resp.read().decode("utf-8"))
-            except urllib.error.HTTPError as exc:
-                err_detail = exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else str(exc)
-                raise LocalModelUnavailable(f"GEMINI_HTTP_{exc.code}: {err_detail[:300]}")
-            except Exception as exc:
-                raise LocalModelUnavailable(f"GEMINI_CALL_FAILED: {exc}")
+            candidates_to_try = [self.model_id]
+            if turn == 0:
+                for c in _CANDIDATE_MODELS:
+                    if c not in candidates_to_try:
+                        candidates_to_try.append(c)
+
+            data = None
+            last_err = None
+            for candidate in candidates_to_try:
+                candidate_url = f"https://generativelanguage.googleapis.com/v1beta/models/{candidate}:generateContent?key={self.api_key}"
+                req = urllib.request.Request(
+                    candidate_url,
+                    data=json.dumps(body).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                try:
+                    with urllib.request.urlopen(req, timeout=min(30, max(2, deadline - time.monotonic()))) as resp:
+                        data = json.loads(resp.read().decode("utf-8"))
+                        if candidate != self.model_id:
+                            _DISCOVERED_MODEL = candidate
+                            self.model_id = candidate
+                            self.model_dict["model_id"] = candidate
+                        break
+                except urllib.error.HTTPError as exc:
+                    err_detail = exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else str(exc)
+                    last_err = f"GEMINI_HTTP_{exc.code}: {err_detail[:300]}"
+                    if exc.code == 404 and turn == 0 and len(candidates_to_try) > 1:
+                        continue
+                    raise LocalModelUnavailable(last_err)
+                except Exception as exc:
+                    raise LocalModelUnavailable(f"GEMINI_CALL_FAILED: {exc}")
+
+            if data is None:
+                raise LocalModelUnavailable(last_err or "GEMINI_CALL_FAILED")
 
             if "usageMetadata" in data:
                 total_usage = data["usageMetadata"]

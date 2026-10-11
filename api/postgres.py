@@ -116,11 +116,12 @@ class PostgresStore(Store):
         from psycopg.rows import dict_row
         options = {"connect_timeout":10, "autocommit":True, "row_factory":dict_row,
                    "options":"-c statement_timeout=15000 -c lock_timeout=15000"}
-        if os.getenv("UA_MODE", "local") != "local":
-            if os.getenv("UA_DB_SSLROOTCERT"):
-                options["sslrootcert"] = os.environ["UA_DB_SSLROOTCERT"]
-                options["sslmode"] = "verify-full"
-            elif "sslmode=" not in self.database_url:
+        if os.getenv("UA_DB_SSLROOTCERT"):
+            options["sslrootcert"] = os.environ["UA_DB_SSLROOTCERT"]
+            options["sslmode"] = "verify-full"
+        elif "sslmode=" not in self.database_url:
+            is_local = "127.0.0.1" in self.database_url or "localhost" in self.database_url
+            if not is_local:
                 options["sslmode"] = "require"
         connection = psycopg.connect(self.database_url, **options)
         connection.execute("SELECT set_config('search_path', 'urban, public', false)")
